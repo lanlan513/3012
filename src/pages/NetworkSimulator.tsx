@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Info, Sparkles, BookOpen, Music, Brain, Palette, Users } from 'lucide-react';
 import NetworkSimulator from '@/components/NetworkSimulator';
 import TimeController from '@/components/TimeController';
-import StatisticsPanel from '@/components/StatisticsPanel';
+import NetworkStatisticsPanel from '@/components/NetworkStatisticsPanel';
 import PersonDetailPanel from '@/components/PersonDetailPanel';
 import { PersonCategory } from '@/types';
 import { getRelationTypeLabel, type RelationType } from '@/data/relations';
@@ -273,7 +273,7 @@ export default function NetworkSimulatorPage() {
               onReset={handleReset}
             />
 
-            <StatisticsPanel currentYear={displayYear} />
+            <NetworkStatisticsPanel currentYear={displayYear} />
 
             {selectedPersonId ? (
               <PersonDetailPanel

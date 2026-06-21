@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Home, Sparkles } from 'lucide-react';
+import { ArrowLeft, Home, Sparkles, Globe2 } from 'lucide-react';
 import ComparisonSlider from '@/components/ComparisonSlider';
 import StatisticsPanel from '@/components/StatisticsPanel';
 import StatusFilter from '@/components/StatusFilter';
@@ -88,6 +88,19 @@ export default function DualTimelinePage() {
             <div className="w-24 md:w-32 h-px bg-gradient-to-r from-transparent via-gold-500/50 to-gold-500/50" />
             <span className="text-gold-500 text-lg">❧</span>
             <div className="w-24 md:w-32 h-px bg-gradient-to-l from-transparent via-gold-500/50 to-gold-500/50" />
+          </div>
+
+          <div className="mt-4 flex justify-center">
+            <Link
+              to="/network-simulator"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-sm bg-gradient-to-r from-amber-700 to-amber-800 text-paper-100 font-body text-sm hover:from-amber-800 hover:to-amber-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Globe2 size={18} className="animate-pulse" />
+              <div className="text-left">
+                <div className="font-semibold">文化网络模拟器</div>
+                <div className="text-[10px] opacity-90">动态观察文化圈的形成与瓦解 →</div>
+              </div>
+            </Link>
           </div>
         </div>
       </header>

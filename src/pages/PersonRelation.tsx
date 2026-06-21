@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, X, BookOpen, Music, Brain, Palette, Users, Play, RotateCcw, Sparkles } from 'lucide-react';
+import { ArrowLeft, X, BookOpen, Music, Brain, Palette, Users, Play, RotateCcw, Sparkles, Globe2 } from 'lucide-react';
 import RelationGraph from '@/components/RelationGraph';
 import { persons, getPersonById } from '@/data/persons';
 import { getRelationsByPersonId, getRelationTypeLabel, RelationType } from '@/data/relations';
@@ -123,6 +123,19 @@ export default function PersonRelationPage() {
             <div className="w-32 h-px bg-gradient-to-r from-transparent to-gold-500/50" />
             <span className="text-gold-500 text-lg">❧</span>
             <div className="w-32 h-px bg-gradient-to-l from-transparent to-gold-500/50" />
+          </div>
+
+          <div className="mt-4 flex justify-center">
+            <Link
+              to="/network-simulator"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-sm bg-gradient-to-r from-gold-600 to-gold-700 text-paper-100 font-body text-sm hover:from-gold-700 hover:to-gold-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Globe2 size={18} className="animate-pulse" />
+              <div className="text-left">
+                <div className="font-semibold">文化网络模拟器</div>
+                <div className="text-[10px] opacity-90">观察生态圈的形成与瓦解 →</div>
+              </div>
+            </Link>
           </div>
         </div>
       </header>
@@ -395,6 +408,28 @@ export default function PersonRelationPage() {
                         <p className="font-body text-paper-500 text-xs">点击"展示圈层形成"观看动画效果</p>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-paper-200/60">
+                    <Link
+                      to="/network-simulator"
+                      className="block w-full"
+                    >
+                      <div className="flex items-start gap-3 p-3 rounded-sm bg-gradient-to-r from-gold-500/10 to-transparent border border-gold-500/30 hover:bg-gold-500/20 transition-colors group">
+                        <div className="w-6 h-6 rounded-full bg-gold-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Globe2 size={12} className="text-gold-700" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-body text-ink-600 text-xs font-semibold group-hover:text-gold-700 transition-colors">
+                            ✨ 文化网络模拟器
+                          </p>
+                          <p className="font-body text-paper-500 text-xs">
+                            随时间观察生态圈的形成与瓦解
+                          </p>
+                        </div>
+                        <span className="text-gold-600 group-hover:translate-x-1 transition-transform">→</span>
+                      </div>
+                    </Link>
                   </div>
                 </div>
               </div>
