@@ -33,11 +33,11 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
         <div className="absolute inset-0 paper-bg opacity-25 pointer-events-none rounded-sm" />
 
         {depth > 0 && (
-          <div className="absolute left-0 top-1/2 -translate-x-full w-6 h-px opacity-40" style={{
-            background: `linear-gradient(to left, currentColor, transparent)`,
-            color: colors.text.replace('text-', '')
+          <div className="absolute left-0 top-1/2 -translate-x-full w-6 h-px" style={{
+            background: `linear-gradient(to left, ${school.category === 'literature' ? '#92400e' : school.category === 'music' ? '#9f1239' : school.category === 'painting' ? '#075985' : '#065f46'}, transparent)`,
+            opacity: 0.7
           }}>
-            <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full ${colors.accent} opacity-60`} />
+            <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full ${colors.accent}`} />
           </div>
         )}
 
@@ -71,7 +71,7 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
                 )}
               </div>
 
-              <div className={`flex items-center gap-2 mb-3 text-sm ${colors.text} opacity-75`}>
+              <div className={`flex items-center gap-2 mb-3 text-sm ${colors.text} opacity-90`}>
                 <MapPin size={13} />
                 <span className="font-body">{school.origin}</span>
               </div>
@@ -80,7 +80,7 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
                 {school.characteristics.map((char, i) => (
                   <span
                     key={i}
-                    className={`px-2 py-0.5 text-xs font-body rounded-sm ${colors.bg} ${colors.text} opacity-80 border ${colors.border}`}
+                    className={`px-2 py-0.5 text-xs font-body rounded-sm ${colors.bg} ${colors.text} border ${colors.border}`}
                   >
                     {char}
                   </span>
@@ -146,13 +146,13 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
                           </span>
                         )}
                         {person.years && (
-                          <span className={`text-xs font-body tabular-nums opacity-60 ${colors.text}`}>
+                          <span className={`text-xs font-body tabular-nums opacity-85 ${colors.text}`}>
                             {person.years}
                           </span>
                         )}
                       </div>
                       {person.role && (
-                        <p className={`text-xs font-body mt-1 opacity-75 ${colors.text}`}>
+                        <p className={`text-xs font-body mt-1 opacity-90 ${colors.text}`}>
                           {person.role}
                         </p>
                       )}
@@ -176,13 +176,13 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
                         《{work.title}》
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-xs font-body opacity-75 ${colors.text}`}>
+                        <span className={`text-xs font-body opacity-90 ${colors.text}`}>
                           {work.author}
                         </span>
                         {work.year && (
                           <>
-                            <span className={`text-xs opacity-50 ${colors.text}`}>·</span>
-                            <span className={`text-xs font-body tabular-nums opacity-75 ${colors.text}`}>
+                            <span className={`text-xs opacity-75 ${colors.text}`}>·</span>
+                            <span className={`text-xs font-body tabular-nums opacity-90 ${colors.text}`}>
                               {work.year}
                             </span>
                           </>
@@ -199,7 +199,7 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
                   <span className="font-decorative text-sm tracking-wider">历 史 背 景</span>
                 </div>
                 <div className={`p-4 rounded-sm ${colors.bg} border ${colors.border}`}>
-                  <p className={`font-body text-sm leading-relaxed ${colors.text} opacity-90`}>
+                  <p className={`font-body text-sm leading-relaxed ${colors.text}`}>
                     {school.historicalContext}
                   </p>
                 </div>
@@ -219,14 +219,14 @@ export default function CulturalSchoolCard({ school, onToggle, isExpanded = true
                       >
                         <span className="text-xs">{CULTURAL_CATEGORY_ICONS[s.category]}</span>
                         <span className="text-sm font-body">{s.name}</span>
-                        <span className={`text-xs opacity-60 tabular-nums`}>
+                        <span className={`text-xs opacity-85 tabular-nums ${colors.text}`}>
                           ({s.yearStart})
                         </span>
                       </div>
                     ))}
                   </div>
                   <div className={`mt-3 p-3 rounded-sm ${colors.bg} border-l-4 ${colors.border} ${colors.text}`}>
-                    <p className="font-body text-sm leading-relaxed opacity-90">
+                    <p className="font-body text-sm leading-relaxed">
                       {school.influenceDescription}
                     </p>
                   </div>

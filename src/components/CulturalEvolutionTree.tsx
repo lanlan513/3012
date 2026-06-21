@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CulturalCategory, CulturalSchool } from '@/types';
 import {
   CULTURAL_CATEGORY_LABELS,
@@ -21,51 +21,80 @@ interface TreeNode {
   level: number;
 }
 
-function buildTree(schools: CulturalSchool[], parentId: string | null, level: number): TreeNode[] {
+function buildTree(schools: CulturalSchool[], parentId: string | null, level: number, visitedIds: Set<string>): TreeNode[] {
   return schools
-    .filter((s) =>
-      parentId === null
-        ? s.parentSchoolIds.length === 0
-        : s.parentSchoolIds.includes(parentId)
-    )
+    .filter((s) => {
+      if (visitedIds.has(s.id)) return false;
+      if (parentId === null) {
+        return s.parentSchoolIds.length === 0;
+      }
+      return s.parentSchoolIds.includes(parentId);
+    })
     .sort((a, b) => a.yearStart - b.yearStart)
-    .map((school) => ({
-      school,
-      level,
-      children: buildTree(schools, school.id, level + 1),
-    }));
+    .map((school) => {
+      visitedIds.add(school.id);
+      return {
+        school,
+        level,
+        children: buildTree(schools, school.id, level + 1, visitedIds),
+      };
+    });
+}
+
+function getAllExpandableIds(nodes: TreeNode[]): Set<string> {
+  const ids = new Set<string>();
+  const collect = (nodeList: TreeNode[]) => {
+    nodeList.forEach((n) => {
+      if (n.children.length > 0) {
+        ids.add(n.school.id);
+        collect(n.children);
+      }
+    });
+  };
+  collect(nodes);
+  return ids;
 }
 
 export default function CulturalEvolutionTree({ category }: Props) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [allExpanded, setAllExpanded] = useState(true);
+  const [userIntervened, setUserIntervened] = useState(false);
 
   const colors = CULTURAL_CATEGORY_COLORS[category];
   const categoryLabel = CULTURAL_CATEGORY_LABELS[category];
   const categoryIcon = CULTURAL_CATEGORY_ICONS[category];
 
   const allSchools = useMemoCategorySchools(category);
-  const tree = buildTree(allSchools, null, 0);
+  const tree = useMemo(() => {
+    const visited = new Set<string>();
+    return buildTree(allSchools, null, 0, visited);
+  }, [allSchools]);
+
+  const allExpandableIds = useMemo(() => getAllExpandableIds(tree), [tree]);
 
   useEffect(() => {
     if (allExpanded) {
-      const ids = new Set<string>();
-      const collect = (nodes: TreeNode[]) => {
-        nodes.forEach((n) => {
-          if (n.children.length > 0) {
-            ids.add(n.school.id);
-            collect(n.children);
-          }
-        });
-      };
-      collect(tree);
-      setExpandedIds(ids);
+      setExpandedIds(new Set(allExpandableIds));
     } else {
       setExpandedIds(new Set());
     }
-  }, [allExpanded, category]);
+    setUserIntervened(false);
+  }, [allExpanded, category, allExpandableIds]);
+
+  useEffect(() => {
+    if (userIntervened) {
+      const isAllExpanded = allExpandableIds.size > 0 && 
+        Array.from(allExpandableIds).every(id => expandedIds.has(id));
+      const isAllCollapsed = allExpandableIds.size === 0 ||
+        Array.from(allExpandableIds).every(id => !expandedIds.has(id));
+      
+      if (isAllExpanded) setAllExpanded(true);
+      else if (isAllCollapsed) setAllExpanded(false);
+    }
+  }, [expandedIds, allExpandableIds, userIntervened]);
 
   const toggleNode = (id: string) => {
+    setUserIntervened(true);
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -77,10 +106,25 @@ export default function CulturalEvolutionTree({ category }: Props) {
     });
   };
 
+  const handleExpandAll = () => {
+    setAllExpanded(true);
+    setExpandedIds(new Set(allExpandableIds));
+    setUserIntervened(false);
+  };
+
+  const handleCollapseAll = () => {
+    setAllExpanded(false);
+    setExpandedIds(new Set());
+    setUserIntervened(false);
+  };
+
   const renderNodes = (nodes: TreeNode[]): React.ReactNode[] => {
     return nodes.map((node) => {
       const hasChildren = node.children.length > 0;
       const isExpanded = expandedIds.has(node.school.id);
+      const connectionColor = category === 'literature' ? '#92400e' :
+                             category === 'music' ? '#9f1239' :
+                             category === 'painting' ? '#075985' : '#065f46';
       return (
         <div key={node.school.id} className="space-y-4">
           <CulturalSchoolCard
@@ -91,7 +135,7 @@ export default function CulturalEvolutionTree({ category }: Props) {
             onToggle={() => toggleNode(node.school.id)}
           />
           {hasChildren && isExpanded && (
-            <div className="ml-2 pl-4 border-l-2 opacity-40" style={{ borderColor: 'currentColor', color: colors.text.replace('text-', '') }}>
+            <div className="ml-4 pl-6 border-l-2" style={{ borderColor: connectionColor, opacity: 0.5 }}>
               {renderNodes(node.children)}
             </div>
           )}
@@ -119,7 +163,7 @@ export default function CulturalEvolutionTree({ category }: Props) {
 
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setAllExpanded(true)}
+            onClick={handleExpandAll}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-body transition-all duration-300 border ${
               allExpanded
                 ? `${colors.bg} ${colors.text} ${colors.border} shadow-sm`
@@ -130,7 +174,7 @@ export default function CulturalEvolutionTree({ category }: Props) {
             <span>全 部 展 开</span>
           </button>
           <button
-            onClick={() => setAllExpanded(false)}
+            onClick={handleCollapseAll}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-body transition-all duration-300 border ${
               !allExpanded
                 ? `${colors.bg} ${colors.text} ${colors.border} shadow-sm`
