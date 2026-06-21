@@ -3,8 +3,8 @@ import Book from '@/components/Book';
 export default function Home() {
   return (
     <div
-      className="min-h-screen bg-gradient-to-b from-paper-50 via-paper-100 to-paper-200 relative overflow-hidden"
-      style={{ minHeight: '100vh' }}
+      className="bg-gradient-to-b from-paper-50 via-paper-100 to-paper-200 relative overflow-hidden"
+      style={{ minHeight: '100vh', height: '100vh' }}
     >
       {/* Background texture */}
       <div className="absolute inset-0 paper-bg opacity-50" />
@@ -18,50 +18,48 @@ export default function Home() {
         }}
       />
 
-      {/* Top bookshelf decoration */}
-      <div className="absolute top-0 left-0 right-0 h-40 opacity-20 pointer-events-none">
-        <div className="h-full bg-gradient-to-b from-leather-900 via-leather-800 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gold-700/30" />
+      {/* Top subtle fade */}
+      <div className="absolute top-0 left-0 right-0 h-24 opacity-15 pointer-events-none">
+        <div className="h-full bg-gradient-to-b from-leather-900 to-transparent" />
       </div>
 
-      {/* Bottom bookshelf decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 opacity-20 pointer-events-none">
-        <div className="h-full bg-gradient-to-t from-leather-900 via-leather-800 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gold-700/30" />
+      {/* Bottom subtle fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 opacity-15 pointer-events-none">
+        <div className="h-full bg-gradient-to-t from-leather-900 to-transparent" />
       </div>
 
       {/* Ambient light from above */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] pointer-events-none opacity-40"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] pointer-events-none opacity-40"
         style={{
           background:
             'radial-gradient(ellipse at center top, rgba(255, 248, 225, 0.6) 0%, transparent 70%)',
         }}
       />
 
-      {/* Main content */}
+      {/* Main content - 高度限制为视口高度，居中布局 */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center py-12 px-4"
-        style={{ minHeight: '100vh' }}
+        className="relative z-10 flex flex-col items-center justify-center px-4"
+        style={{ minHeight: '100vh', height: '100vh' }}
       >
-        {/* Top decoration */}
+        {/* Top decoration - 更紧凑 */}
         <div
-          className="mb-6 md:mb-8"
+          className="mb-4 md:mb-6"
           style={{
             animation: 'fadeIn 1s ease-out 200ms both',
           }}
         >
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-3 md:gap-5">
             <div
-              className="w-20 md:w-28 h-px"
+              className="w-16 md:w-24 h-px"
               style={{
                 background:
                   'linear-gradient(to right, transparent, rgba(184, 134, 11, 0.4), rgba(184, 134, 11, 0.6))',
               }}
             />
-            <span className="text-gold-600 text-xl md:text-2xl">❦</span>
+            <span className="text-gold-600 text-lg md:text-xl">❦</span>
             <div
-              className="w-20 md:w-28 h-px"
+              className="w-16 md:w-24 h-px"
               style={{
                 background:
                   'linear-gradient(to left, transparent, rgba(184, 134, 11, 0.4), rgba(184, 134, 11, 0.6))',
@@ -70,54 +68,54 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Book component - responsive sizing */}
-        <div className="flex-shrink-0 mb-6 md:mb-10 w-full max-w-[600px]" style={{ height: 'clamp(480px, 85vh, 800px)' }}>
+        {/* Book component - 更紧凑的高度，确保内容在首屏 */}
+        <div
+          className="flex-shrink-0 w-full max-w-[560px] mb-3 md:mb-5"
+          style={{ height: 'clamp(400px, 72vh, 640px)' }}
+        >
           <div className="w-full h-full flex items-center justify-center">
-            <div className="scale-[clamp(0.55,1vw,1)] origin-center">
+            <div
+              className="origin-center"
+              style={{
+                transform: 'scale(clamp(0.65, 1vw, 1))',
+              }}
+            >
               <Book />
             </div>
           </div>
         </div>
 
-        {/* Bottom text */}
+        {/* Bottom text - 更紧凑，整合在首屏 */}
         <div
           className="text-center"
           style={{
             animation: 'fadeIn 1s ease-out 2800ms both',
           }}
         >
-          <p className="font-serif text-paper-600 text-sm md:text-base italic mb-2 md:mb-3">
+          <p className="font-serif text-paper-600 text-xs md:text-sm italic mb-1 md:mb-2">
             一个关于人、城市与时代的故事
           </p>
           <p
-            className="text-paper-500 text-xs tracking-[0.3em]"
+            className="text-paper-500 text-[10px] md:text-xs tracking-[0.3em]"
             style={{ fontFamily: 'Cinzel, Georgia, serif' }}
           >
             斯蒂芬·茨威格 · 一个欧洲人的回忆
           </p>
         </div>
 
-        {/* Scroll indicator */}
+        {/* 向下提示 - 更低调 */}
         <div
-          className="absolute bottom-12 md:bottom-16 left-1/2 -translate-x-1/2"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2"
           style={{
             animation: 'fadeIn 1s ease-out 3200ms both, float 6s ease-in-out 3200ms infinite',
           }}
         >
-          <div className="flex flex-col items-center gap-2 text-paper-500/80">
+          <div className="flex flex-col items-center gap-1 text-paper-500/60">
             <span
-              className="text-xs tracking-wider"
+              className="text-[10px] tracking-wider"
               style={{ fontFamily: 'Crimson Pro, Georgia, serif' }}
             >
-              翻阅时光
-            </span>
-            <span
-              className="text-lg"
-              style={{
-                animation: 'bounce 2s infinite',
-              }}
-            >
-              ↓
+              点击「翻开时光」进入
             </span>
           </div>
         </div>
@@ -125,16 +123,12 @@ export default function Home() {
 
       <style>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
+          from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes float {
           0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(-10px); }
-        }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
+          50% { transform: translateX(-50%) translateY(-6px); }
         }
       `}</style>
     </div>
