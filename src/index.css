@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Crimson Pro', Georgia, serif;
+  line-height: 1.7;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f7f5f0;
+  color: #332515;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .paper-bg {
+    background-color: #fef6e6;
+    background-image: 
+      linear-gradient(rgba(212, 160, 23, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 160, 23, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    position: relative;
+  }
+
+  .paper-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="200" height="200" filter="url(%23noise)" opacity="0.06"/%3E%3C/svg%3E');
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .gold-text {
+    background: linear-gradient(135deg, #ffd87a 0%, #d4a017 30%, #b8860b 50%, #d4a017 70%, #ffd87a 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: goldShine 4s linear infinite;
+  }
+
+  @keyframes goldShine {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .ornate-border {
+    border: 2px solid #b89752;
+    position: relative;
+  }
+
+  .ornate-border::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(184, 151, 82, 0.5);
+    pointer-events: none;
+  }
+
+  .book-shadow {
+    box-shadow: 
+      0 0 0 1px rgba(60, 42, 6, 0.1),
+      2px 2px 0 rgba(60, 42, 6, 0.05),
+      5px 5px 20px rgba(60, 42, 6, 0.15),
+      20px 30px 60px rgba(60, 42, 6, 0.25);
+  }
+
+  .page-curl {
+    position: relative;
+  }
+
+  .page-curl::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, transparent 50%, rgba(60, 42, 6, 0.1) 50%);
+    pointer-events: none;
+  }
+
+  .ink-drop-cap::first-letter {
+    float: left;
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    line-height: 0.8;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    color: #5f4521;
+    font-weight: 600;
+  }
+
+  .vintage-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #b89752 20%, #b89752 80%, transparent 100%);
+    position: relative;
+  }
+
+  .vintage-divider::before {
+    content: '❧';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fef6e6;
+    padding: 0 1rem;
+    color: #b89752;
+    font-size: 1.25rem;
+  }
+}
