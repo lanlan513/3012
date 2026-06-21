@@ -1005,6 +1005,10 @@ export const culturalSchools: CulturalSchool[] = [
   },
 ];
 
+export const getCulturalSchools = (): CulturalSchool[] => {
+  return culturalSchools;
+};
+
 export const getCulturalSchoolById = (id: string): CulturalSchool | undefined => {
   return culturalSchools.find((school) => school.id === id);
 };
