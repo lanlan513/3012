@@ -1,4 +1,11 @@
-import { Person } from '@/types';
+import { Person, PersonCategory } from '@/types';
+
+export const CATEGORY_LABELS: Record<PersonCategory, string> = {
+  literature: '文学',
+  music: '音乐',
+  philosophy: '哲学',
+  art: '艺术',
+};
 
 export const persons: Person[] = [
   {
@@ -7,6 +14,7 @@ export const persons: Person[] = [
     birthYear: 1881,
     deathYear: 1942,
     occupation: '作家、传记文学家',
+    category: 'literature',
     description:
       '奥地利著名作家、诗人、剧作家和传记作家，以细腻的心理描写和对人性的深刻洞察著称。代表作有《一个陌生女人的来信》《象棋的故事》《人类群星闪耀时》等。晚年因不堪纳粹迫害流亡巴西，留下《昨日的世界》作为对那个逝去时代的深情挽歌。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Stefan%20Zweig%20Austrian%20writer%20vintage%20sepia%20style%20elegant%2019th%20century&image_size=square_hd',
@@ -19,6 +27,7 @@ export const persons: Person[] = [
     birthYear: 1856,
     deathYear: 1939,
     occupation: '心理学家、精神分析创始人',
+    category: 'philosophy',
     description:
       '奥地利心理学家，精神分析学派的创始人。他的潜意识理论对二十世纪的文学艺术产生了深远影响，茨威格在维也纳时期与他有交往，其作品也深受心理学影响。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Sigmund%20Freud%20vintage%20sepia%20photograph%20bearded%20man%20serious%20expression&image_size=square_hd',
@@ -31,6 +40,7 @@ export const persons: Person[] = [
     birthYear: 1860,
     deathYear: 1911,
     occupation: '作曲家、指挥家',
+    category: 'music',
     description:
       '奥地利作曲家、指挥家，晚期浪漫主义音乐代表人物。曾任维也纳宫廷歌剧院指挥，是维也纳文化黄金时代的重要人物。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Gustav%20Mahler%20composer%20vintage%20sepia%20photograph%20bearded%20musician&image_size=square_hd',
@@ -43,6 +53,7 @@ export const persons: Person[] = [
     birthYear: 1866,
     deathYear: 1944,
     occupation: '作家、诺贝尔文学奖得主',
+    category: 'literature',
     description:
       '法国作家，1915年诺贝尔文学奖获得者。代表作《约翰·克利斯朵夫》。茨威格的好友，两人在一战期间共同呼吁和平，反对战争。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Romain%20Rolland%20French%20writer%20vintage%20sepia%20photograph%20intellectual&image_size=square_hd',
@@ -55,6 +66,7 @@ export const persons: Person[] = [
     birthYear: 1844,
     deathYear: 1896,
     occupation: '诗人',
+    category: 'literature',
     description:
       '法国象征主义诗人，对青年茨威格产生了深远影响。茨威格在书中回忆了自己年轻时对法国诗歌的热爱与模仿。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Paul%20Verlaine%20French%20poet%20vintage%20sepia%20photograph%20symbolist&image_size=square_hd',
@@ -67,6 +79,7 @@ export const persons: Person[] = [
     birthYear: 1844,
     deathYear: 1900,
     occupation: '哲学家',
+    category: 'philosophy',
     description:
       '德国哲学家，对二十世纪思想文化影响深远。茨威格在书中提到尼采对那一代年轻人的震撼性影响。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Friedrich%20Nietzsche%20philosopher%20vintage%20sepia%20photograph%20mustache&image_size=square_hd',
@@ -79,6 +92,7 @@ export const persons: Person[] = [
     birthYear: 1906,
     deathYear: 1975,
     occupation: '舞者、演员',
+    category: 'art',
     description:
       '美国黑人舞蹈家、歌手，1920年代在巴黎走红，成为欧洲舞台上的传奇。她代表了两次大战之间欧洲的繁华与多元文化。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Josephine%20Baker%20dancer%20vintage%20sepia%20photograph%201920s%20elegant&image_size=square_hd',
@@ -91,11 +105,181 @@ export const persons: Person[] = [
     birthYear: 1883,
     deathYear: 1924,
     occupation: '作家',
+    category: 'literature',
     description:
       '奥匈帝国犹太裔作家，现代派文学奠基人。与茨威格同为布拉格德语圈作家，以荒诞与异化的主题预示了那个时代的精神危机。',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Franz%20Kafka%20writer%20vintage%20sepia%20photograph%20thin%20man%20suit&image_size=square_hd',
     quote: '"一本书必须是一把能劈开我们心中冰封大海的斧子。"',
     chapterIds: ['chapter-2', 'chapter-3', 'chapter-4'],
+  },
+  {
+    id: 'person-rilke',
+    name: '赖内·马利亚·里尔克',
+    birthYear: 1875,
+    deathYear: 1926,
+    occupation: '诗人',
+    category: 'literature',
+    description:
+      '奥地利诗人，二十世纪最伟大的德语诗人之一。代表作《杜伊诺哀歌》《给青年诗人的信》。茨威格与里尔克相识，对其诗歌推崇备至。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Rainer%20Maria%20Rilke%20poet%20vintage%20sepia%20photograph%20elegant%20melancholic&image_size=square_hd',
+    quote: '"有何胜利可言，挺住就是一切。"',
+    chapterIds: ['chapter-2', 'chapter-3', 'chapter-4'],
+  },
+  {
+    id: 'person-hofmannsthal',
+    name: '胡戈·冯·霍夫曼斯塔尔',
+    birthYear: 1874,
+    deathYear: 1929,
+    occupation: '作家、剧作家',
+    category: 'literature',
+    description:
+      '奥地利作家、诗人，维也纳现代派的代表人物。少年成名，被誉为"神童"。与茨威格同属维也纳文化圈，是世纪末维也纳文学的璀璨明星。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Hugo%20von%20Hofmannsthal%20writer%20vintage%20sepia%20photograph%20austrian%20elegant&image_size=square_hd',
+    quote: '"深刻与轻浮并不矛盾。"',
+    chapterIds: ['chapter-1', 'chapter-2', 'chapter-3'],
+  },
+  {
+    id: 'person-schnitzler',
+    name: '阿图尔·施尼茨勒',
+    birthYear: 1862,
+    deathYear: 1931,
+    occupation: '作家、医生',
+    category: 'literature',
+    description:
+      '奥地利作家、医生，维也纳现代派的重要代表。以心理描写和对性与死亡主题的探索著称。茨威格在书中回忆了施尼茨勒在维也纳文化生活中的重要地位。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Arthur%20Schnitzler%20writer%20doctor%20vintage%20sepia%20photograph%20austrian&image_size=square_hd',
+    quote: '"我们的记忆是唯一不会失去的天堂。"',
+    chapterIds: ['chapter-1', 'chapter-2', 'chapter-3'],
+  },
+  {
+    id: 'person-proust',
+    name: '马塞尔·普鲁斯特',
+    birthYear: 1871,
+    deathYear: 1922,
+    occupation: '作家',
+    category: 'literature',
+    description:
+      '法国作家，意识流文学的先驱。代表作《追忆似水年华》。茨威格对普鲁斯特推崇备至，在书中专门论述其文学成就，认为他是那个时代最伟大的小说家之一。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Marcel%20Proust%20writer%20vintage%20sepia%20photograph%20french%20intellectual&image_size=square_hd',
+    quote: '"真正的发现之旅，不在于寻找新大陆，而在于拥有新视角。"',
+    chapterIds: ['chapter-2', 'chapter-3', 'chapter-4'],
+  },
+  {
+    id: 'person-mann',
+    name: '托马斯·曼',
+    birthYear: 1875,
+    deathYear: 1955,
+    occupation: '作家、诺贝尔文学奖得主',
+    category: 'literature',
+    description:
+      '德国作家，1929年诺贝尔文学奖获得者。代表作《布登勃洛克一家》《魔山》。与茨威格同为德语文学的代表人物，后因反纳粹立场流亡美国。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Thomas%20Mann%20writer%20nobel%20prize%20vintage%20sepia%20photograph%20german&image_size=square_hd',
+    quote: '"人的生活，只有在他为一个理念而奋斗时，才有意义。"',
+    chapterIds: ['chapter-2', 'chapter-3', 'chapter-4', 'chapter-5'],
+  },
+  {
+    id: 'person-wagner',
+    name: '理查德·瓦格纳',
+    birthYear: 1813,
+    deathYear: 1883,
+    occupation: '作曲家、剧作家',
+    category: 'music',
+    description:
+      '德国作曲家，浪漫主义音乐的代表人物。其歌剧改革影响深远。茨威格在书中回忆了维也纳对瓦格纳的狂热崇拜，以及瓦格纳音乐节在拜罗伊特的盛况。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Richard%20Wagner%20composer%20vintage%20sepia%20photograph%20german%20dramatic&image_size=square_hd',
+    quote: '"艺术是生活的最高境界。"',
+    chapterIds: ['chapter-1', 'chapter-2'],
+  },
+  {
+    id: 'person-strauss',
+    name: '理查德·施特劳斯',
+    birthYear: 1864,
+    deathYear: 1949,
+    occupation: '作曲家、指挥家',
+    category: 'music',
+    description:
+      '德国作曲家、指挥家，晚期浪漫主义音乐代表。代表作《查拉图斯特拉如是说》。与茨威格有过合作，共同创作歌剧《沉默的女人》，后因纳粹时期的复杂关系而疏远。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Richard%20Strauss%20composer%20conductor%20vintage%20sepia%20photograph%20german&image_size=square_hd',
+    quote: '"我可能不是第一流的作曲家，但我是第一流的第二流作曲家。"',
+    chapterIds: ['chapter-2', 'chapter-3', 'chapter-4', 'chapter-5'],
+  },
+  {
+    id: 'person-schoenberg',
+    name: '阿诺德·勋伯格',
+    birthYear: 1874,
+    deathYear: 1951,
+    occupation: '作曲家、音乐理论家',
+    category: 'music',
+    description:
+      '奥地利作曲家，二十世纪最重要的作曲家之一，十二音技法的发明者。代表了音乐从浪漫主义向现代主义的转型，其音乐革命在当时引起巨大争议。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Arnold%20Schoenberg%20composer%20vintage%20sepia%20photograph%20austrian%20serious&image_size=square_hd',
+    quote: '"我的音乐不是让人听懂的，而是让人感受的。"',
+    chapterIds: ['chapter-2', 'chapter-3', 'chapter-4'],
+  },
+  {
+    id: 'person-russell',
+    name: '伯特兰·罗素',
+    birthYear: 1872,
+    deathYear: 1970,
+    occupation: '哲学家、数学家',
+    category: 'philosophy',
+    description:
+      '英国哲学家、数学家、社会活动家，1950年诺贝尔文学奖获得者。分析哲学的创始人之一。茨威格在书中提到罗素，将其视为理性主义的代表人物。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Bertrand%20Russell%20philosopher%20mathematician%20vintage%20sepia%20photograph%20british&image_size=square_hd',
+    quote: '"对爱情的渴望，对知识的追求，对人类苦难不可遏制的同情，是支配我一生的单纯而强烈的三种感情。"',
+    chapterIds: ['chapter-2', 'chapter-3', 'chapter-4', 'chapter-6'],
+  },
+  {
+    id: 'person-einstein',
+    name: '阿尔伯特·爱因斯坦',
+    birthYear: 1879,
+    deathYear: 1955,
+    occupation: '物理学家',
+    category: 'philosophy',
+    description:
+      '德裔美籍物理学家，相对论的创立者，现代物理学奠基人。与茨威格同为欧洲流亡知识分子，是那个时代科学与人文交汇的象征。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Albert%20Einstein%20physicist%20vintage%20sepia%20photograph%20genius&image_size=square_hd',
+    quote: '"想象力比知识更重要。"',
+    chapterIds: ['chapter-2', 'chapter-4', 'chapter-5', 'chapter-6'],
+  },
+  {
+    id: 'person-klimt',
+    name: '古斯塔夫·克里姆特',
+    birthYear: 1862,
+    deathYear: 1918,
+    occupation: '画家',
+    category: 'art',
+    description:
+      '奥地利画家，维也纳分离派创始人。代表作《吻》。其华丽装饰性的艺术风格是维也纳黄金时代的视觉象征，茨威格在书中多次提到那个时代的艺术氛围。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Gustav%20Klimt%20painter%20vintage%20sepia%20photograph%20austrian%20artistic&image_size=square_hd',
+    quote: '"艺术是围绕我们生命的线。"',
+    chapterIds: ['chapter-1', 'chapter-2'],
+  },
+  {
+    id: 'person-schiele',
+    name: '埃贡·席勒',
+    birthYear: 1890,
+    deathYear: 1918,
+    occupation: '画家',
+    category: 'art',
+    description:
+      '奥地利画家，维也纳分离派的重要代表，表现主义先驱。以扭曲的线条和强烈的情感表达著称。其早逝是欧洲文化的巨大损失。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Egon%20Schiele%20painter%20vintage%20sepia%20photograph%20austrian%20expressionist&image_size=square_hd',
+    quote: '"我要通过画人来表达人的内心。"',
+    chapterIds: ['chapter-2', 'chapter-3'],
+  },
+  {
+    id: 'person-rodin',
+    name: '奥古斯特·罗丹',
+    birthYear: 1840,
+    deathYear: 1917,
+    occupation: '雕塑家',
+    category: 'art',
+    description:
+      '法国雕塑家，现代雕塑之父。代表作《思想者》《巴尔扎克像》。茨威格对罗丹极为推崇，曾专门为其写作，并在巴黎拜访过罗丹的工作室。',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20of%20Auguste%20Rodin%20sculptor%20vintage%20sepia%20photograph%20french%20artist&image_size=square_hd',
+    quote: '"生活中不是缺少美，而是缺少发现美的眼睛。"',
+    chapterIds: ['chapter-2', 'chapter-3'],
   },
 ];
 

@@ -1,7 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { getPersonById } from '@/data/persons';
 import { getChapterById } from '@/data/chapters';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
+import { CATEGORY_LABELS } from '@/data/persons';
 
 export default function PersonDetail() {
   const { id } = useParams<{ id: string }>();
@@ -31,13 +32,23 @@ export default function PersonDetail() {
       {/* Header */}
       <header className="relative z-10 pt-8 pb-6">
         <div className="container mx-auto px-6">
-          <Link
-            to="/timeline"
-            className="inline-flex items-center gap-2 text-paper-600 hover:text-gold-700 transition-colors duration-300 font-body text-sm"
-          >
-            <ArrowLeft size={16} />
-            <span>返回时间线</span>
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link
+              to="/timeline"
+              className="inline-flex items-center gap-2 text-paper-600 hover:text-gold-700 transition-colors duration-300 font-body text-sm"
+            >
+              <ArrowLeft size={16} />
+              <span>返回时间线</span>
+            </Link>
+            <Link
+              to="/relations"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
+            >
+              <Users size={14} />
+              <span className="hidden sm:inline">人 物 关 系</span>
+              <span className="sm:hidden">关 系</span>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -79,6 +90,12 @@ export default function PersonDetail() {
                   {/* Occupation */}
                   <div className="font-decorative text-gold-600 text-sm tracking-[0.2em] mb-3">
                     {person.occupation.toUpperCase()}
+                  </div>
+
+                  <div className="mb-3">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-leather-500/10 text-leather-600 text-xs font-body border border-leather-400/30">
+                      {CATEGORY_LABELS[person.category]}
+                    </span>
                   </div>
 
                   {/* Name */}

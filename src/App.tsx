@@ -6,6 +6,7 @@ import PersonDetail from "@/pages/PersonDetail";
 import PlaceDetail from "@/pages/PlaceDetail";
 import EventDetail from "@/pages/EventDetail";
 import MapPage from "@/pages/MapPage";
+import PersonRelationPage from "@/pages/PersonRelation";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/timeline" element={<TimelinePage />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="/relations" element={<PersonRelationPage />} />
         <Route path="/chapter/:id" element={<Chapter />} />
         <Route path="/person/:id" element={<PersonDetail />} />
         <Route path="/place/:id" element={<PlaceDetail />} />

@@ -1,6 +1,6 @@
 import Timeline from '@/components/Timeline';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin, Users } from 'lucide-react';
 
 export default function TimelinePage() {
   return (
@@ -31,15 +31,25 @@ export default function TimelinePage() {
               </p>
             </div>
 
-            {/* Map entry button */}
-            <Link
-              to="/map"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
-            >
-              <MapPin size={14} />
-              <span className="hidden sm:inline">昨 日 地 图</span>
-              <span className="sm:hidden">地 图</span>
-            </Link>
+            {/* Navigation buttons */}
+            <div className="flex items-center gap-2">
+              <Link
+                to="/relations"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
+              >
+                <Users size={14} />
+                <span className="hidden sm:inline">人 物 关 系</span>
+                <span className="sm:hidden">关 系</span>
+              </Link>
+              <Link
+                to="/map"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
+              >
+                <MapPin size={14} />
+                <span className="hidden sm:inline">昨 日 地 图</span>
+                <span className="sm:hidden">地 图</span>
+              </Link>
+            </div>
           </div>
 
           {/* Decorative divider */}

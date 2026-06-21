@@ -8,12 +8,15 @@ export interface Chapter {
   quote: string;
 }
 
+export type PersonCategory = 'literature' | 'music' | 'philosophy' | 'art';
+
 export interface Person {
   id: string;
   name: string;
   birthYear: number;
   deathYear: number;
   occupation: string;
+  category: PersonCategory;
   description: string;
   imageUrl: string;
   quote: string;
