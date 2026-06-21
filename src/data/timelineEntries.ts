@@ -289,3 +289,15 @@ export function getWarEra(year: number): 'pre-war' | 'war' | 'interwar' | 'wwii'
   if (year > 1918 && year < 1939) return 'interwar';
   return 'wwii';
 }
+
+export function getAllTimelineEntries(): TimelineEntry[] {
+  const allEntries: TimelineEntry[] = [];
+  Object.values(personTimelines).forEach(entries => {
+    allEntries.push(...entries);
+  });
+  return allEntries;
+}
+
+export function getPersonIds(): string[] {
+  return Object.keys(personTimelines);
+}

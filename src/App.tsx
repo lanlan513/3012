@@ -8,6 +8,7 @@ import EventDetail from "@/pages/EventDetail";
 import MapPage from "@/pages/MapPage";
 import PersonRelationPage from "@/pages/PersonRelation";
 import CafePage from "@/pages/CafePage";
+import NewspaperPage from "@/pages/Newspaper";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/relations" element={<PersonRelationPage />} />
         <Route path="/cafe" element={<CafePage />} />
+        <Route path="/newspaper" element={<NewspaperPage />} />
         <Route path="/chapter/:id" element={<Chapter />} />
         <Route path="/person/:id" element={<PersonDetail />} />
         <Route path="/place/:id" element={<PlaceDetail />} />
