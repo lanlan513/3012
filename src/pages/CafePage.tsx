@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Coffee, Clock, Users, BookOpen, Music, Sparkles, X } from 'lucide-react';
 import { cafeTables } from '@/data/cafes';
@@ -53,6 +53,12 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 function TableCard({ table, isSelected, onClick }: { table: CafeTable; isSelected: boolean; onClick: () => void }) {
+  const uniquePersons = useMemo(() => {
+    const set = new Set<string>();
+    table.discussions.forEach((d) => d.personIds.forEach((pid) => set.add(pid)));
+    return set.size;
+  }, [table]);
+
   return (
     <button
       type="button"
@@ -90,14 +96,15 @@ function TableCard({ table, isSelected, onClick }: { table: CafeTable; isSelecte
         }`}>
           {table.description}
         </p>
-        <div className="mt-3 flex items-center gap-2">
-          <Users size={12} className={isSelected ? 'text-gold-500' : 'text-paper-400'} />
-          <span className={`text-xs font-body ${isSelected ? 'text-gold-600' : 'text-paper-500'}`}>
-            {table.discussions.reduce((acc, d) => acc + d.personIds.length, 0)} 位思想者
-          </span>
-          <span className="text-paper-300 mx-1">·</span>
-          <span className={`text-xs font-body ${isSelected ? 'text-gold-600' : 'text-paper-500'}`}>
+        <div className="mt-3 flex items-center gap-2 flex-wrap">
+          <span className={`inline-flex items-center gap-1 text-xs font-body ${isSelected ? 'text-gold-600' : 'text-paper-500'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-gold-400' : 'bg-paper-400'}`} />
             {table.discussions.length} 场讨论
+          </span>
+          <span className="text-paper-300">/</span>
+          <span className={`inline-flex items-center gap-1 text-xs font-body ${isSelected ? 'text-gold-600' : 'text-paper-500'}`}>
+            <Users size={11} />
+            {uniquePersons} 位独立思想者
           </span>
         </div>
       </div>
@@ -293,17 +300,33 @@ export default function CafePage() {
     ? cafeTables.find((t) => t.id === selectedTable) || null
     : null;
 
-  const filteredDiscussions = useMemo(() => {
-    if (!currentTable) return [];
-    if (selectedEra === 'all') return currentTable.discussions;
-    return currentTable.discussions.filter((d) => d.era === selectedEra);
-  }, [currentTable, selectedEra]);
-
   const availableEras = useMemo(() => {
     if (!currentTable) return [];
     const eras = new Set(currentTable.discussions.map((d) => d.era));
     return (['pre-war', 'war', 'interwar', 'wwii'] as WarEra[]).filter((e) => eras.has(e));
   }, [currentTable]);
+
+  useEffect(() => {
+    if (!currentTable) return;
+    if (selectedEra !== 'all' && !availableEras.includes(selectedEra)) {
+      setSelectedEra('all');
+    }
+  }, [currentTable, availableEras, selectedEra]);
+
+  const handleTableClick = (tableId: string) => {
+    if (selectedTable === tableId) {
+      setSelectedTable(null);
+    } else {
+      setSelectedTable(tableId);
+      setSelectedEra('all');
+    }
+  };
+
+  const filteredDiscussions = useMemo(() => {
+    if (!currentTable) return [];
+    if (selectedEra === 'all') return currentTable.discussions;
+    return currentTable.discussions.filter((d) => d.era === selectedEra);
+  }, [currentTable, selectedEra]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-leather-50/80 via-paper-100 to-paper-200 relative">
@@ -392,7 +415,7 @@ export default function CafePage() {
                       key={table.id}
                       table={table}
                       isSelected={selectedTable === table.id}
-                      onClick={() => setSelectedTable(selectedTable === table.id ? null : table.id)}
+                      onClick={() => handleTableClick(table.id)}
                     />
                   ))}
                 </div>
