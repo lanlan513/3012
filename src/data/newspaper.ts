@@ -176,13 +176,20 @@ function generateColumn(entry: TimelineEntry, personName: string): NewspaperColu
   };
 }
 
-function generateNewsFlash(entry: TimelineEntry): NewsFlash {
+function generateNewsFlash(entry: TimelineEntry, newspaperMonth: number, newspaperYear: number): NewsFlash {
   const categories: Array<'politics' | 'economy' | 'culture' | 'international'> = 
     ['politics', 'economy', 'culture', 'international'];
   
+  let month: number;
+  if (entry.year < newspaperYear) {
+    month = Math.floor(Math.random() * 12) + 1;
+  } else {
+    month = Math.floor(Math.random() * newspaperMonth) + 1;
+  }
+  
   return {
     id: `flash-${entry.year}-${entry.title}`,
-    date: `${entry.year}年${Math.floor(Math.random() * 12) + 1}月`,
+    date: `${entry.year}年${month}月`,
     content: entry.title,
     category: categories[Math.floor(Math.random() * categories.length)],
   };
@@ -225,11 +232,9 @@ function generateAdvertisements(era: WarEra): string[] {
   return adsByEra[era].slice(0, 3);
 }
 
-function generateDateLine(year: number, era: WarEra): string {
+function generateDateLine(year: number, era: WarEra, month: number, day: number): string {
   const newspapers = NEWSPAPER_NAMES[era];
   const newspaper = newspapers[Math.floor(Math.random() * newspapers.length)];
-  const month = Math.floor(Math.random() * 12) + 1;
-  const day = Math.floor(Math.random() * 28) + 1;
   const cities = ['维也纳', '柏林', '巴黎', '伦敦', '苏黎世', '布拉格'];
   const city = cities[Math.floor(Math.random() * cities.length)];
   
@@ -257,6 +262,9 @@ export function generateNewspaper(year: number): Newspaper {
   const entries = getEntriesForYear(year);
   const yearEvents = getEventsForYear(year);
   const activePersons = getPersonsActiveInYear(year);
+  
+  const newspaperMonth = Math.floor(Math.random() * 12) + 1;
+  const newspaperDay = Math.floor(Math.random() * 28) + 1;
   
   const allHeadlines: NewspaperHeadline[] = [];
   
@@ -288,11 +296,15 @@ export function generateNewspaper(year: number): Newspaper {
   const newsFlashes: NewsFlash[] = [];
   const allEntriesForEra = getAllTimelineEntries().filter(e => {
     const eEra = getWarEra(e.year);
-    return eEra === era && e.year <= year && e.year > year - 3;
+    return eEra === era && e.year <= year;
   });
   
-  allEntriesForEra.slice(0, 6).forEach(entry => {
-    newsFlashes.push(generateNewsFlash(entry));
+  const recentEntries = allEntriesForEra
+    .sort((a, b) => b.year - a.year)
+    .slice(0, 6);
+  
+  recentEntries.forEach(entry => {
+    newsFlashes.push(generateNewsFlash(entry, newspaperMonth, year));
   });
   
   const mainHeadline = allHeadlines[0] || {
@@ -307,7 +319,7 @@ export function generateNewspaper(year: number): Newspaper {
     year,
     era,
     chapterTitle: chapter.title,
-    dateLine: generateDateLine(year, era),
+    dateLine: generateDateLine(year, era, newspaperMonth, newspaperDay),
     weather: generateWeather(era),
     frontPage: {
       mainHeadline,

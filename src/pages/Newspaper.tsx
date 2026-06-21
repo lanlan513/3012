@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Users, Coffee, ChevronLeft, ChevronRight, Calendar, Sun, Cloud, CloudRain, Wind } from 'lucide-react';
 import { generateNewspaper, getAvailableYears, Newspaper, NewspaperHeadline, NewspaperColumn, NewsFlash } from '@/data/newspaper';
+import { getWarEra } from '@/data/timelineEntries';
+import type { WarEra } from '@/types';
 
 const CATEGORY_LABELS: Record<string, string> = {
   culture: '文化',
@@ -150,7 +152,14 @@ function Advertisement({ text }: { text: string }) {
   );
 }
 
-function YearSlider({ 
+const ERA_RANGES: Array<{ key: WarEra; label: string; start: number; end: number }> = [
+  { key: 'pre-war', label: '战前黄金时代', start: 1881, end: 1914 },
+  { key: 'war', label: '第一次世界大战', start: 1914, end: 1918 },
+  { key: 'interwar', label: '两次大战之间', start: 1918, end: 1939 },
+  { key: 'wwii', label: '第二次世界大战', start: 1939, end: 1942 },
+];
+
+function YearSelector({ 
   years, 
   selectedYear, 
   onYearChange 
@@ -159,59 +168,134 @@ function YearSlider({
   selectedYear: number; 
   onYearChange: (year: number) => void;
 }) {
-  const currentIndex = years.indexOf(selectedYear);
+  const [selectedEra, setSelectedEra] = useState<WarEra>(() => {
+    if (selectedYear < 1914) return 'pre-war';
+    if (selectedYear <= 1918) return 'war';
+    if (selectedYear < 1939) return 'interwar';
+    return 'wwii';
+  });
+  
+  const currentEraRange = ERA_RANGES.find(e => e.key === selectedEra)!;
+  const eraYears = years.filter(y => y >= currentEraRange.start && y <= currentEraRange.end);
+  const currentIndex = eraYears.indexOf(selectedYear);
   
   const goToPrev = () => {
     if (currentIndex > 0) {
-      onYearChange(years[currentIndex - 1]);
+      onYearChange(eraYears[currentIndex - 1]);
+    } else if (ERA_RANGES.findIndex(e => e.key === selectedEra) > 0) {
+      const prevEra = ERA_RANGES[ERA_RANGES.findIndex(e => e.key === selectedEra) - 1];
+      const prevEraYears = years.filter(y => y >= prevEra.start && y <= prevEra.end);
+      setSelectedEra(prevEra.key);
+      onYearChange(prevEraYears[prevEraYears.length - 1]);
     }
   };
   
   const goToNext = () => {
-    if (currentIndex < years.length - 1) {
-      onYearChange(years[currentIndex + 1]);
+    if (currentIndex < eraYears.length - 1) {
+      onYearChange(eraYears[currentIndex + 1]);
+    } else if (ERA_RANGES.findIndex(e => e.key === selectedEra) < ERA_RANGES.length - 1) {
+      const nextEra = ERA_RANGES[ERA_RANGES.findIndex(e => e.key === selectedEra) + 1];
+      const nextEraYears = years.filter(y => y >= nextEra.start && y <= nextEra.end);
+      setSelectedEra(nextEra.key);
+      onYearChange(nextEraYears[0]);
+    }
+  };
+  
+  const handleEraChange = (era: WarEra) => {
+    setSelectedEra(era);
+    const eraRange = ERA_RANGES.find(e => e.key === era)!;
+    const eraYearList = years.filter(y => y >= eraRange.start && y <= eraRange.end);
+    if (eraYearList.length > 0) {
+      const closestYear = eraYearList.reduce((prev, curr) => 
+        Math.abs(curr - selectedYear) < Math.abs(prev - selectedYear) ? curr : prev
+      );
+      onYearChange(closestYear);
     }
   };
   
   return (
-    <div className="flex items-center justify-center gap-4 py-4">
-      <button
-        onClick={goToPrev}
-        disabled={currentIndex === 0}
-        className="p-2 rounded-full border border-ink-300/50 text-ink-600 hover:bg-ink-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-      >
-        <ChevronLeft size={20} />
-      </button>
-      
-      <div className="flex-1 max-w-2xl">
-        <div className="relative">
-          <div className="absolute left-0 right-0 top-1/2 h-px bg-ink-300/50" />
-          <div className="relative flex justify-between px-2">
-            {years.map((year, idx) => (
-              <button
-                key={year}
-                onClick={() => onYearChange(year)}
-                className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all duration-300 ${
-                  year === selectedYear
-                    ? 'bg-ink-800 text-paper-50 scale-110 shadow-lg'
-                    : 'bg-paper-100 text-ink-500 hover:bg-ink-200/50'
-                }`}
-                title={`${year}年`}
-              >
-                {idx % 5 === 0 ? year : ''}
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="space-y-4">
+      {/* Era selector */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {ERA_RANGES.map((era) => (
+          <button
+            key={era.key}
+            onClick={() => handleEraChange(era.key)}
+            className={`px-3 py-1.5 text-xs font-decorative tracking-wider transition-all duration-300 rounded-sm ${
+              selectedEra === era.key
+                ? 'bg-ink-800 text-paper-50 shadow-md'
+                : 'bg-paper-100 text-ink-600 hover:bg-ink-100 border border-ink-200/50'
+            }`}
+          >
+            {era.label}
+            <span className="ml-1.5 text-[10px] opacity-70">
+              {era.start}-{era.end}
+            </span>
+          </button>
+        ))}
       </div>
       
-      <button
-        onClick={goToNext}
-        disabled={currentIndex === years.length - 1}
-        className="p-2 rounded-full border border-ink-300/50 text-ink-600 hover:bg-ink-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-      >
-        <ChevronRight size={20} />
-      </button>
+      {/* Year navigation */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={goToPrev}
+          disabled={selectedEra === 'pre-war' && currentIndex === 0}
+          className="p-2 rounded-full border border-ink-300/50 text-ink-600 hover:bg-ink-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          title="上一年"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        
+        <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px] items-center">
+          {eraYears.map((year) => (
+            <button
+              key={year}
+              onClick={() => onYearChange(year)}
+              className={`relative w-9 h-9 rounded-sm flex items-center justify-center text-sm font-serif transition-all duration-200 ${
+                year === selectedYear
+                  ? 'bg-ink-800 text-paper-50 scale-105 shadow-md'
+                  : 'bg-paper-100 text-ink-600 hover:bg-ink-100 border border-ink-200/50 hover:scale-105'
+              }`}
+              style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+              title={`${year}年`}
+            >
+              {year}
+            </button>
+          ))}
+        </div>
+        
+        <button
+          onClick={goToNext}
+          disabled={selectedEra === 'wwii' && currentIndex === eraYears.length - 1}
+          className="p-2 rounded-full border border-ink-300/50 text-ink-600 hover:bg-ink-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          title="下一年"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+      
+      {/* Quick jump */}
+      <div className="flex items-center justify-center gap-2 text-xs text-ink-500">
+        <span className="font-decorative tracking-wider">快 速 跳 转：</span>
+        {[1890, 1900, 1910, 1920, 1930, 1940].map((jumpYear) => {
+          const closestYear = years.reduce((prev, curr) => 
+            Math.abs(curr - jumpYear) < Math.abs(prev - jumpYear) ? curr : prev
+          );
+          return (
+            <button
+              key={jumpYear}
+              onClick={() => {
+                const era = getWarEra(closestYear);
+                setSelectedEra(era);
+                onYearChange(closestYear);
+              }}
+              className="px-2 py-0.5 bg-paper-50 border border-ink-200/50 hover:border-gold-500/50 hover:text-gold-700 transition-colors rounded-sm font-body"
+            >
+              {jumpYear}s
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -311,7 +395,7 @@ export default function NewspaperPage() {
               {ERA_LABELS[newspaper.era]}
             </span>
           </div>
-          <YearSlider 
+          <YearSelector 
             years={availableYears} 
             selectedYear={selectedYear} 
             onYearChange={setSelectedYear} 
