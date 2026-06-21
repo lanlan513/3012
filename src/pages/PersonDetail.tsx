@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getPersonById } from '@/data/persons';
 import { getChapterById } from '@/data/chapters';
 import { getPersonTimeline } from '@/data/timelineEntries';
-import { ArrowLeft, Users, Clock, MapPin, Coffee } from 'lucide-react';
+import { ArrowLeft, Users, Clock, MapPin, Coffee, Sparkles } from 'lucide-react';
 import { CATEGORY_LABELS } from '@/data/persons';
 import { useState, useMemo, useEffect } from 'react';
 import { WarEra, TimelineEntry } from '@/types';
@@ -285,6 +285,19 @@ export default function PersonDetail() {
                   </div>
                 </div>
               )}
+              <Link
+                to="/culture"
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm hover:-translate-y-0.5 ${
+                  currentEra === 'war' ? 'border-red-500/40 text-red-700 hover:bg-red-500/10' :
+                  currentEra === 'wwii' ? 'border-gray-600/40 text-gray-700 hover:bg-gray-500/10' :
+                  currentEra === 'interwar' ? 'border-blue-500/40 text-blue-700 hover:bg-blue-500/10' :
+                  'border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100'
+                }`}
+              >
+                <Sparkles size={14} />
+                <span className="hidden sm:inline">文 化 脉 络</span>
+                <span className="sm:hidden">文 化</span>
+              </Link>
               <Link
                 to="/cafe"
                 className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm hover:-translate-y-0.5 ${

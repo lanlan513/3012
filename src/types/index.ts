@@ -111,3 +111,35 @@ export interface CafeTable {
   atmosphere: string;
   discussions: CafeDiscussion[];
 }
+
+export type CulturalCategory = 'literature' | 'music' | 'painting' | 'philosophy';
+
+export interface RepresentativeWork {
+  title: string;
+  author: string;
+  year?: number;
+}
+
+export interface RepresentativePerson {
+  id?: string;
+  name: string;
+  years?: string;
+  role?: string;
+}
+
+export interface CulturalSchool {
+  id: string;
+  name: string;
+  category: CulturalCategory;
+  yearStart: number;
+  yearEnd?: number;
+  origin: string;
+  keyIdeas: string[];
+  representativePersons: RepresentativePerson[];
+  representativeWorks: RepresentativeWork[];
+  influenceDescription: string;
+  influencedSchoolIds: string[];
+  parentSchoolIds: string[];
+  characteristics: string[];
+  historicalContext: string;
+}
