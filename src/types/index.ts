@@ -74,4 +74,15 @@ export interface Event {
   personIds: string[];
 }
 
+export type TimelineTrack = 'personal' | 'historical' | 'cultural';
+
+export type WarEra = 'pre-war' | 'war' | 'interwar' | 'wwii';
+
+export interface TimelineEntry {
+  year: number;
+  title: string;
+  description: string;
+  track: TimelineTrack;
+}
+
 export type CardType = 'person' | 'place' | 'event';
