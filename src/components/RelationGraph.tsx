@@ -20,8 +20,6 @@ interface GraphNode extends SimulationNodeDatum {
   category: PersonCategory;
   radius: number;
   birthYear: number;
-  initialX: number;
-  initialY: number;
   appearDelay: number;
 }
 
@@ -38,8 +36,6 @@ const CATEGORY_COLORS: Record<PersonCategory, string> = {
   philosophy: '#5c440c',
   art: '#a67d4d',
 };
-
-
 
 const RELATION_COLORS: Record<RelationType, string> = {
   friendship: '#d4a017',
@@ -77,7 +73,8 @@ export default function RelationGraph({
   const simulationRef = useRef<ReturnType<typeof forceSimulation<GraphNode>> | null>(null);
   const nodesRef = useRef<GraphNode[]>([]);
   const linksRef = useRef<GraphLink[]>([]);
-  const [, setTickCount] = useState(0);
+  const [renderTick, setRenderTick] = useState(0);
+  const [isSimulating, setIsSimulating] = useState(true);
   const [visibleNodes, setVisibleNodes] = useState<Set<string>>(new Set());
   const [visibleLinks, setVisibleLinks] = useState<Set<number>>(new Set());
 
@@ -127,8 +124,8 @@ export default function RelationGraph({
       const connCount = getConnectionCount(person.id);
       const radius = person.id === 'person-zweig' ? 32 : 16 + connCount * 1.8;
       const offset = CATEGORY_CENTER_OFFSETS[person.category];
-      const clusterX = centerX + offset.x * dimensions.width;
-      const clusterY = centerY + offset.y * dimensions.height;
+      const clusterX = centerX + offset.x * dimensions.width * 0.5;
+      const clusterY = centerY + offset.y * dimensions.height * 0.5;
 
       return {
         id: person.id,
@@ -136,11 +133,9 @@ export default function RelationGraph({
         category: person.category,
         radius,
         birthYear: person.birthYear,
-        x: clusterX + (Math.random() - 0.5) * 80,
-        y: clusterY + (Math.random() - 0.5) * 80,
-        initialX: clusterX + (Math.random() - 0.5) * 80,
-        initialY: clusterY + (Math.random() - 0.5) * 80,
-        appearDelay: index * 80,
+        x: clusterX + (Math.random() - 0.5) * 40,
+        y: clusterY + (Math.random() - 0.5) * 40,
+        appearDelay: index * 60,
       };
     });
 
@@ -153,54 +148,65 @@ export default function RelationGraph({
         type: relation.type,
         description: relation.description,
         era: relation.era,
-        appearDelay: (delayIndex + 2) * 80 + 200,
+        appearDelay: (delayIndex + 2) * 60 + 300,
       };
     });
 
     nodesRef.current = nodes;
     linksRef.current = links;
+    setIsSimulating(true);
 
     const simulation = forceSimulation<GraphNode>(nodes)
       .force(
         'link',
         forceLink<GraphNode, GraphLink>(links)
           .id((d) => d.id)
-          .distance(120)
-          .strength(0.5)
+          .distance(110)
+          .strength(0.4)
       )
       .force(
         'charge',
         forceManyBody<GraphNode>()
-          .strength(-350)
-          .distanceMin(60)
-          .distanceMax(350)
+          .strength(-280)
+          .distanceMin(50)
+          .distanceMax(300)
       )
       .force(
         'center',
-        forceCenter(centerX, centerY).strength(0.05)
+        forceCenter(centerX, centerY).strength(0.03)
       )
       .force(
         'collide',
-        forceCollide<GraphNode>().radius((d) => d.radius + 10)
+        forceCollide<GraphNode>().radius((d) => d.radius + 8)
       )
       .force('x', forceX<GraphNode>().x((d) => {
         const offset = CATEGORY_CENTER_OFFSETS[d.category];
-        return centerX + offset.x * dimensions.width * 0.6;
-      }).strength(0.15))
+        return centerX + offset.x * dimensions.width * 0.45;
+      }).strength(0.2))
       .force('y', forceY<GraphNode>().y((d) => {
         const offset = CATEGORY_CENTER_OFFSETS[d.category];
-        return centerY + offset.y * dimensions.height * 0.6;
-      }).strength(0.15))
+        return centerY + offset.y * dimensions.height * 0.45;
+      }).strength(0.2))
       .alpha(1)
-      .alphaDecay(0.015)
+      .alphaDecay(0.05)
+      .velocityDecay(0.5)
       .on('tick', () => {
-        setTickCount((t) => t + 1);
+        setRenderTick((t) => t + 1);
+      })
+      .on('end', () => {
+        setIsSimulating(false);
       });
 
     simulationRef.current = simulation;
 
+    const stopTimeout = setTimeout(() => {
+      simulation.stop();
+      setIsSimulating(false);
+    }, 3000);
+
     return () => {
       simulation.stop();
+      clearTimeout(stopTimeout);
     };
   }, [sortedPersons, filteredRelations, dimensions, getConnectionCount]);
 
@@ -290,6 +296,52 @@ export default function RelationGraph({
     [selectedPersonId, onSelectPerson]
   );
 
+  const handleNodeMouseDown = useCallback(
+    (id: string, e: React.MouseEvent) => {
+      e.preventDefault();
+      const simulation = simulationRef.current;
+      if (!simulation) return;
+
+      const node = nodesRef.current.find((n) => n.id === id);
+      if (!node) return;
+
+      simulation.alpha(0.3).alphaDecay(0.05).restart();
+      setIsSimulating(true);
+
+      const startX = node.x ?? 0;
+      const startY = node.y ?? 0;
+      const offsetX = e.clientX;
+      const offsetY = e.clientY;
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const container = containerRef.current;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        node.x = Math.max(50, Math.min(dimensions.width - 50, moveEvent.clientX - rect.left));
+        node.y = Math.max(50, Math.min(dimensions.height - 50, moveEvent.clientY - rect.top));
+        node.fx = node.x;
+        node.fy = node.y;
+        setRenderTick((t) => t + 1);
+      };
+
+      const handleMouseUp = () => {
+        node.fx = null;
+        node.fy = null;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        setTimeout(() => {
+          if (simulationRef.current) {
+            simulationRef.current.alphaTarget(0);
+          }
+        }, 500);
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    },
+    [dimensions]
+  );
+
   const activeId = selectedPersonId || hoveredNodeId;
   const activeRelations = activeId
     ? filteredRelations.filter(
@@ -313,8 +365,8 @@ export default function RelationGraph({
         const offset = CATEGORY_CENTER_OFFSETS[cat];
         result.push({
           category: cat,
-          x: centerX + offset.x * dimensions.width * 0.55,
-          y: centerY + offset.y * dimensions.height * 0.55,
+          x: centerX + offset.x * dimensions.width * 0.4,
+          y: centerY + offset.y * dimensions.height * 0.4,
           label: labels[cat],
         });
       }
@@ -329,7 +381,7 @@ export default function RelationGraph({
         ref={svgRef}
         width={dimensions.width}
         height={dimensions.height}
-        className="block"
+        className="block select-none"
       >
         <defs>
           {filteredPersons.map((person) => (
@@ -353,13 +405,6 @@ export default function RelationGraph({
           </filter>
           <filter id="soft-glow">
             <feGaussianBlur stdDeviation="2" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="cluster-glow">
-            <feGaussianBlur stdDeviation="8" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -406,7 +451,7 @@ export default function RelationGraph({
           const isVisible = visibleLinks.has(i);
 
           return (
-            <g key={`link-${i}`} style={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.6s ease-out' }}>
+            <g key={`link-${i}`} style={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.5s ease-out' }}>
               <line
                 x1={sourcePos.x}
                 y1={sourcePos.y}
@@ -447,14 +492,13 @@ export default function RelationGraph({
               key={node.id}
               transform={`translate(${pos.x}, ${pos.y})`}
               onClick={() => handleNodeClick(node.id)}
+              onMouseDown={(e) => handleNodeMouseDown(node.id, e)}
               onMouseEnter={() => setHoveredNodeId(node.id)}
               onMouseLeave={() => setHoveredNodeId(null)}
               style={{ 
-                cursor: 'pointer',
+                cursor: isSimulating ? 'grab' : 'pointer',
                 opacity: isVisible ? opacity : 0,
-                transform: `translate(${pos.x}px, ${pos.y}px) scale(${isVisible ? 1 : 0})`,
-                transformOrigin: 'center',
-                transition: 'opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transition: 'opacity 0.4s ease-out',
               }}
             >
               {(isSelected || isHovered) && (

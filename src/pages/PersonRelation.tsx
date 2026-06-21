@@ -50,12 +50,17 @@ export default function PersonRelationPage() {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const toggleCategory = useCallback((cat: PersonCategory) => {
-    setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
+    setSelectedCategories((prev) => {
+      const next = prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat];
+      const currentPerson = selectedPersonId ? getPersonById(selectedPersonId) : null;
+      if (currentPerson && !next.includes(currentPerson.category)) {
+        setSelectedPersonId(null);
+      }
+      return next;
+    });
     setAnimationPhase(0);
     setTimeout(() => setAnimationPhase(1), 50);
-  }, []);
+  }, [selectedPersonId]);
 
   const handlePlayAnimation = useCallback(() => {
     setAnimationPhase(0);
