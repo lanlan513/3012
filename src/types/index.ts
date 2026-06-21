@@ -86,3 +86,28 @@ export interface TimelineEntry {
 }
 
 export type CardType = 'person' | 'place' | 'event';
+
+export type CafeTableCategory = 'literature' | 'music' | 'philosophy' | 'art';
+
+export interface CafeDiscussion {
+  id: string;
+  title: string;
+  description: string;
+  personIds: string[];
+  era: WarEra;
+  viewpointClashes: {
+    personId: string;
+    viewpoint: string;
+  }[];
+  historicalBackground: string;
+}
+
+export interface CafeTable {
+  id: string;
+  name: string;
+  category: CafeTableCategory;
+  description: string;
+  icon: string;
+  atmosphere: string;
+  discussions: CafeDiscussion[];
+}

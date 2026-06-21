@@ -1,6 +1,6 @@
 import Timeline from '@/components/Timeline';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Users } from 'lucide-react';
+import { ArrowLeft, MapPin, Users, Coffee } from 'lucide-react';
 
 export default function TimelinePage() {
   return (
@@ -33,6 +33,14 @@ export default function TimelinePage() {
 
             {/* Navigation buttons */}
             <div className="flex items-center gap-2">
+              <Link
+                to="/cafe"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
+              >
+                <Coffee size={14} />
+                <span className="hidden sm:inline">昨 日 咖 啡 馆</span>
+                <span className="sm:hidden">咖 啡</span>
+              </Link>
               <Link
                 to="/relations"
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
