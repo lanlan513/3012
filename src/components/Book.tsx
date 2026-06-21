@@ -110,6 +110,15 @@ export default function Book() {
               <span className="absolute inset-0 rounded-sm border border-paper-500/60 transition-colors group-hover:border-gold-500/70" />
               <span className="absolute inset-1 rounded-sm border border-paper-400/35 transition-colors group-hover:border-gold-400/55" />
             </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/star-map')}
+              className="group relative mt-3 inline-flex min-h-[36px] items-center justify-center px-5 py-1.5 font-decorative text-xs tracking-[0.15em] text-paper-500 transition-colors hover:text-gold-600 focus:outline-none"
+              aria-label="仰望星空，进入文化宇宙"
+            >
+              <span className="relative z-10">✦ 仰 望 星 空 ✦</span>
+            </button>
           </div>
 
           <div className="font-serif text-xs text-paper-500">I</div>

@@ -12,12 +12,14 @@ import NewspaperPage from "@/pages/Newspaper";
 import CultureEvolution from "@/pages/CultureEvolution";
 import StreetArchivePage from "@/pages/StreetArchive";
 import DualTimelinePage from "@/pages/DualTimeline";
+import StarMap from "@/pages/StarMap";
 
 export default function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/star-map" element={<StarMap />} />
         <Route path="/timeline" element={<TimelinePage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/relations" element={<PersonRelationPage />} />
