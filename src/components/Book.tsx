@@ -114,10 +114,13 @@ export default function Book() {
             <button
               type="button"
               onClick={() => navigate('/star-map')}
-              className="group relative mt-3 inline-flex min-h-[36px] items-center justify-center px-5 py-1.5 font-decorative text-xs tracking-[0.15em] text-paper-500 transition-colors hover:text-gold-600 focus:outline-none"
-              aria-label="仰望星空，进入文化宇宙"
+              className="group relative mt-4 inline-flex min-h-[44px] items-center justify-center gap-2 px-6 py-2 font-decorative text-sm tracking-[0.18em] text-paper-600 transition-all hover:text-gold-700 focus:outline-none focus:ring-2 focus:ring-gold-500/50"
+              aria-label="仰望星空，探索文化宇宙"
             >
-              <span className="relative z-10">✦ 仰 望 星 空 ✦</span>
+              <span className="text-lg text-gold-500 group-hover:scale-110 transition-transform">✦</span>
+              <span className="relative z-10">仰 望 星 空 · 探 索 文 化 宇 宙</span>
+              <span className="text-lg text-gold-500 group-hover:scale-110 transition-transform">✦</span>
+              <span className="absolute inset-0 rounded-sm border border-dashed border-paper-400/50 transition-colors group-hover:border-gold-500/60" />
             </button>
           </div>
 

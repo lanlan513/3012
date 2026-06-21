@@ -13,6 +13,7 @@ import CultureEvolution from "@/pages/CultureEvolution";
 import StreetArchivePage from "@/pages/StreetArchive";
 import DualTimelinePage from "@/pages/DualTimeline";
 import StarMap from "@/pages/StarMap";
+import SchoolDetail from "@/pages/SchoolDetail";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/cafe" element={<CafePage />} />
         <Route path="/newspaper" element={<NewspaperPage />} />
         <Route path="/culture" element={<CultureEvolution />} />
+        <Route path="/school/:id" element={<SchoolDetail />} />
         <Route path="/street-archive" element={<StreetArchivePage />} />
         <Route path="/dual-timeline" element={<DualTimelinePage />} />
         <Route path="/chapter/:id" element={<Chapter />} />

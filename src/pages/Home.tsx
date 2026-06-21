@@ -104,7 +104,7 @@ export default function Home() {
               className="text-[10px] tracking-wider"
               style={{ fontFamily: 'Crimson Pro, Georgia, serif' }}
             >
-              点击「翻开时光」进入
+              点击「翻开时光」进入时间线 · 或「仰望星空」探索文化宇宙
             </span>
           </div>
         </div>

@@ -146,7 +146,7 @@ export const generateStarNodes = (): StarNode[] => {
       description: school.influenceDescription,
       yearStart: school.yearStart,
       yearEnd: school.yearEnd,
-      detailPath: `/culture`,
+      detailPath: `/school/${school.id}`,
       importance: getSchoolImportance(school),
     });
   });
