@@ -1,6 +1,6 @@
 import Timeline from '@/components/Timeline';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Users, Coffee, Newspaper as NewspaperIcon, Sparkles, Building2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Users, Coffee, Newspaper as NewspaperIcon, Sparkles, Building2, SplitSquareVertical } from 'lucide-react';
 
 export default function TimelinePage() {
   return (
@@ -33,6 +33,14 @@ export default function TimelinePage() {
 
             {/* Navigation buttons */}
             <div className="flex items-center gap-2 flex-wrap">
+              <Link
+                to="/dual-timeline"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-red-500/40 text-red-700 hover:bg-red-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
+              >
+                <SplitSquareVertical size={14} />
+                <span className="hidden sm:inline">双 时 空 对 比</span>
+                <span className="sm:hidden">对 比</span>
+              </Link>
               <Link
                 to="/street-archive"
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"

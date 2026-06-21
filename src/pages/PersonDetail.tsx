@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getPersonById } from '@/data/persons';
 import { getChapterById } from '@/data/chapters';
 import { getPersonTimeline } from '@/data/timelineEntries';
-import { ArrowLeft, Users, Clock, MapPin, Coffee, Sparkles } from 'lucide-react';
+import { ArrowLeft, Users, Clock, MapPin, Coffee, Sparkles, SplitSquareVertical } from 'lucide-react';
 import { CATEGORY_LABELS } from '@/data/persons';
 import { useState, useMemo, useEffect } from 'react';
 import { WarEra, TimelineEntry } from '@/types';
@@ -297,6 +297,19 @@ export default function PersonDetail() {
                 <Sparkles size={14} />
                 <span className="hidden sm:inline">文 化 脉 络</span>
                 <span className="sm:hidden">文 化</span>
+              </Link>
+              <Link
+                to="/dual-timeline"
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm hover:-translate-y-0.5 ${
+                  currentEra === 'war' ? 'border-red-600/50 text-red-800 hover:bg-red-500/20 bg-red-500/10' :
+                  currentEra === 'wwii' ? 'border-gray-600/50 text-gray-800 hover:bg-gray-500/20 bg-gray-500/10' :
+                  currentEra === 'interwar' ? 'border-blue-600/50 text-blue-800 hover:bg-blue-500/20 bg-blue-500/10' :
+                  'border-red-500/50 text-red-700 hover:bg-red-500 hover:text-paper-100 bg-red-50/50'
+                }`}
+              >
+                <SplitSquareVertical size={14} />
+                <span className="hidden sm:inline">双 时 空</span>
+                <span className="sm:hidden">对 比</span>
               </Link>
               <Link
                 to="/cafe"

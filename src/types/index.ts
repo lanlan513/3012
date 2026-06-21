@@ -191,3 +191,58 @@ export interface StreetScene {
   easterEggs: EasterEgg[];
   historicalBackground: string;
 }
+
+export type ComparisonStatus = 'preserved' | 'lost' | 'rebuilt' | 'transformed' | 'new';
+
+export interface ComparisonItem {
+  id: string;
+  name: string;
+  category: 'city' | 'cultural' | 'social' | 'institution';
+  status: ComparisonStatus;
+  preWar: {
+    description: string;
+    imageUrl?: string;
+    year: string;
+    notableFigures?: string[];
+  };
+  postWar: {
+    description: string;
+    imageUrl?: string;
+    year: string;
+    notableFigures?: string[];
+  };
+  changeDescription: string;
+  historicalSignificance: string;
+  relatedPlaceId?: string;
+  relatedPersonIds?: string[];
+}
+
+export interface ComparisonCategory {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  items: ComparisonItem[];
+}
+
+export interface EraStatistics {
+  totalCulturalInstitutions: number;
+  lostInstitutions: number;
+  rebuiltInstitutions: number;
+  transformedInstitutions: number;
+  newInstitutions: number;
+  displacedPersons: number;
+  destroyedBuildings: string;
+  culturalLossDescription: string;
+}
+
+export interface DualTimelineData {
+  preWarYear: string;
+  postWarYear: string;
+  title: string;
+  subtitle: string;
+  categories: ComparisonCategory[];
+  statistics: EraStatistics;
+  themeQuote: string;
+  themeQuoteAuthor: string;
+}
