@@ -14,6 +14,7 @@ import StreetArchivePage from "@/pages/StreetArchive";
 import DualTimelinePage from "@/pages/DualTimeline";
 import StarMap from "@/pages/StarMap";
 import SchoolDetail from "@/pages/SchoolDetail";
+import NetworkSimulatorPage from "@/pages/NetworkSimulator";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/timeline" element={<TimelinePage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/relations" element={<PersonRelationPage />} />
+        <Route path="/network-simulator" element={<NetworkSimulatorPage />} />
         <Route path="/cafe" element={<CafePage />} />
         <Route path="/newspaper" element={<NewspaperPage />} />
         <Route path="/culture" element={<CultureEvolution />} />

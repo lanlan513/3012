@@ -1,177 +1,134 @@
-import { EraStatistics } from '@/types';
-import { BookOpen, Users, Building2, AlertTriangle, TrendingUp, RefreshCw } from 'lucide-react';
+import { Users, Link2, Network, TrendingDown, Activity, Heart } from 'lucide-react';
+import { calculateNetworkStats } from '@/data/networkSimulation';
 
 interface StatisticsPanelProps {
-  statistics: EraStatistics;
+  currentYear: number;
 }
 
-export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
-  const lostPercentage = Math.round((statistics.lostInstitutions / statistics.totalCulturalInstitutions) * 100);
-  const rebuiltPercentage = Math.round((statistics.rebuiltInstitutions / statistics.totalCulturalInstitutions) * 100);
-  const transformedPercentage = Math.round((statistics.transformedInstitutions / statistics.totalCulturalInstitutions) * 100);
+export default function StatisticsPanel({ currentYear }: StatisticsPanelProps) {
+  const stats = calculateNetworkStats(currentYear);
 
-  const stats = [
+  const statItems = [
     {
-      label: '文化机构总数',
-      value: statistics.totalCulturalInstitutions,
-      icon: BookOpen,
-      color: 'text-gold-600',
-      bgColor: 'bg-gold-50',
-      borderColor: 'border-gold-200/60',
-    },
-    {
-      label: '永远消逝',
-      value: statistics.lostInstitutions,
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200/60',
-      sublabel: `占 ${lostPercentage}%`,
-    },
-    {
-      label: '战后重建',
-      value: statistics.rebuiltInstitutions,
-      icon: RefreshCw,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
-      borderColor: 'border-amber-200/60',
-      sublabel: `占 ${rebuiltPercentage}%`,
-    },
-    {
-      label: '彻底改变',
-      value: statistics.transformedInstitutions,
-      icon: TrendingUp,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200/60',
-      sublabel: `占 ${transformedPercentage}%`,
-    },
-    {
-      label: '流亡知识分子',
-      value: `${statistics.displacedPersons}+`,
       icon: Users,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200/60',
-      sublabel: '作家、学者、艺术家',
+      label: '活跃人物',
+      value: stats.activePersons,
+      total: stats.totalPersons,
+      color: '#b8860b',
+      description: '当前在文化圈中活跃的人物数量',
     },
     {
-      label: '建筑损毁',
-      value: statistics.destroyedBuildings,
-      icon: Building2,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200/60',
-      sublabel: '主要城市平均',
+      icon: Link2,
+      label: '活跃关系',
+      value: stats.activeRelations,
+      total: stats.totalRelations,
+      color: '#8b6914',
+      description: '当前存在的文化关联数量',
+    },
+    {
+      icon: Network,
+      label: '平均连接数',
+      value: stats.averageDegree.toFixed(1),
+      color: '#5c440c',
+      description: '每人平均拥有的关系数量',
+    },
+    {
+      icon: Activity,
+      label: '网络密度',
+      value: `${(stats.density * 100).toFixed(1)}%`,
+      color: '#a67d4d',
+      description: '实际连接与可能连接的比例',
+    },
+    {
+      icon: Heart,
+      label: '文化凝聚力',
+      value: `${(stats.cohesionIndex * 10).toFixed(0)}%`,
+      color: stats.cohesionIndex > 0.5 ? '#2e7d32' : stats.cohesionIndex > 0.3 ? '#f57c00' : '#c62828',
+      description: '文化生态圈的整体凝聚程度',
+    },
+    {
+      icon: TrendingDown,
+      label: '战争冲击',
+      value: `${(stats.warImpact * 100).toFixed(0)}%`,
+      color: stats.warImpact > 0.5 ? '#c62828' : stats.warImpact > 0.2 ? '#f57c00' : '#2e7d32',
+      description: '战争对文化网络的破坏程度',
     },
   ];
 
   return (
-    <div className="relative bg-paper-100/80 rounded-sm p-6 shadow-paper border border-paper-200/60">
-      <div className="absolute inset-0 paper-bg rounded-sm pointer-events-none opacity-40" />
-      <div className="absolute inset-2 border border-paper-200/40 rounded-sm pointer-events-none" />
-
-      <div className="relative">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-px bg-gradient-to-r from-transparent via-gold-400/60 to-gold-400/60" />
-          <h3 className="font-serif text-xl font-semibold text-ink-700">
-            文明的损失 · 数据统计
-          </h3>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-gold-400/60 to-gold-400/60" />
+    <div className="bg-paper-100/90 backdrop-blur-sm rounded-sm border border-paper-300/60 shadow-paper p-4">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-6 h-6 rounded-full bg-gold-500/20 flex items-center justify-center">
+          <Activity size={14} className="text-gold-700" />
         </div>
+        <h3 className="font-serif text-lg text-ink-700 font-semibold">
+          网络状态
+        </h3>
+        <div className="flex-1 h-px bg-gradient-to-r from-gold-500/30 to-transparent" />
+      </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
-          {stats.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
+      <div className="grid grid-cols-2 gap-3">
+        {statItems.map((item, index) => (
+          <div
+            key={index}
+            className="bg-paper-50/80 rounded-sm border border-paper-200/60 p-3"
+          >
+            <div className="flex items-center gap-2 mb-2">
               <div
-                key={i}
-                className={`${stat.bgColor} border ${stat.borderColor} rounded-sm p-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md`}
+                className="w-5 h-5 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${item.color}20` }}
               >
-                <Icon size={20} className={`${stat.color} mx-auto mb-2`} />
-                <div className={`font-serif text-2xl font-bold ${stat.color}`}>
-                  {stat.value}
-                </div>
-                <div className="font-decorative text-xs text-paper-600 tracking-wider mt-1">
-                  {stat.label}
-                </div>
-                {stat.sublabel && (
-                  <div className="text-[10px] text-paper-500 mt-1">
-                    {stat.sublabel}
-                  </div>
-                )}
+                <item.icon size={12} style={{ color: item.color }} />
               </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-4 p-4 bg-red-50/50 border border-red-200/50 rounded-sm">
-          <div className="flex items-start gap-3">
-            <AlertTriangle size={18} className="text-red-500 mt-0.5 flex-shrink-0" />
-            <div>
-              <h4 className="font-serif text-sm font-semibold text-red-800 mb-1">
-                文化的损失
-              </h4>
-              <p className="font-body text-xs text-red-700/80 leading-relaxed">
-                {statistics.culturalLossDescription}
-              </p>
+              <span className="font-body text-[11px] text-paper-600">{item.label}</span>
             </div>
+            
+            <div className="flex items-baseline gap-1 mb-1">
+              <span
+                className="font-serif text-xl font-bold tabular-nums"
+                style={{ color: item.color }}
+              >
+                {item.value}
+              </span>
+              {item.total !== undefined && (
+                <span className="font-body text-[10px] text-paper-400 tabular-nums">
+                  / {item.total}
+                </span>
+              )}
+            </div>
+            
+            <p className="font-body text-[10px] text-paper-500 leading-relaxed">
+              {item.description}
+            </p>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="mt-4">
-          <div className="text-[10px] font-decorative tracking-wider text-paper-500 mb-2">
-            文化机构命运分布
-          </div>
-          <div className="h-3 bg-paper-200/50 rounded-full overflow-hidden flex">
-            <div
-              className="h-full bg-emerald-400 transition-all duration-700"
-              style={{ width: `${((statistics.totalCulturalInstitutions - statistics.lostInstitutions - statistics.rebuiltInstitutions - statistics.transformedInstitutions - statistics.newInstitutions) / statistics.totalCulturalInstitutions) * 100}%` }}
-              title="得以保存"
-            />
-            <div
-              className="h-full bg-amber-400 transition-all duration-700"
-              style={{ width: `${(statistics.rebuiltInstitutions / statistics.totalCulturalInstitutions) * 100}%` }}
-              title="战后重建"
-            />
-            <div
-              className="h-full bg-blue-400 transition-all duration-700"
-              style={{ width: `${(statistics.transformedInstitutions / statistics.totalCulturalInstitutions) * 100}%` }}
-              title="彻底改变"
-            />
-            <div
-              className="h-full bg-sky-400 transition-all duration-700"
-              style={{ width: `${(statistics.newInstitutions / statistics.totalCulturalInstitutions) * 100}%` }}
-              title="战后新生"
-            />
-            <div
-              className="h-full bg-red-400 transition-all duration-700"
-              style={{ width: `${(statistics.lostInstitutions / statistics.totalCulturalInstitutions) * 100}%` }}
-              title="永远消逝"
-            />
-          </div>
-          <div className="flex justify-between mt-2 text-[10px] text-paper-500">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full" />
-              保存
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-amber-400 rounded-full" />
-              重建
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-blue-400 rounded-full" />
-              改变
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-sky-400 rounded-full" />
-              新生
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-red-400 rounded-full" />
-              消逝
-            </span>
-          </div>
+      <div className="mt-4 pt-4 border-t border-paper-200/60">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-body text-xs text-paper-600">文化生态健康度</span>
+          <span
+            className="font-serif text-sm font-bold"
+            style={{
+              color: stats.cohesionIndex > 0.5 ? '#2e7d32' : stats.cohesionIndex > 0.3 ? '#f57c00' : '#c62828',
+            }}
+          >
+            {(stats.cohesionIndex * 100).toFixed(0)}%
+          </span>
+        </div>
+        <div className="h-2 bg-paper-200 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{
+              width: `${stats.cohesionIndex * 100}%`,
+              backgroundColor: stats.cohesionIndex > 0.5 ? '#4caf50' : stats.cohesionIndex > 0.3 ? '#ff9800' : '#f44336',
+            }}
+          />
+        </div>
+        <div className="flex justify-between mt-1 text-[9px] font-body text-paper-400">
+          <span>崩溃</span>
+          <span>脆弱</span>
+          <span>健康</span>
         </div>
       </div>
     </div>
