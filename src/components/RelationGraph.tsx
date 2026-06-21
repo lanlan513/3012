@@ -73,17 +73,27 @@ export default function RelationGraph({
   const simulationRef = useRef<ReturnType<typeof forceSimulation<GraphNode>> | null>(null);
   const nodesRef = useRef<GraphNode[]>([]);
   const linksRef = useRef<GraphLink[]>([]);
-  const [renderTick, setRenderTick] = useState(0);
+  const [, setRenderTick] = useState(0);
   const [isSimulating, setIsSimulating] = useState(true);
   const [visibleNodes, setVisibleNodes] = useState<Set<string>>(new Set());
   const [visibleLinks, setVisibleLinks] = useState<Set<number>>(new Set());
 
-  const filteredPersons = persons.filter((p) =>
-    selectedCategories.includes(p.category)
+  const filteredPersons = useMemo(
+    () => persons.filter((p) => selectedCategories.includes(p.category)),
+    [selectedCategories]
   );
-  const filteredPersonIds = new Set(filteredPersons.map((p) => p.id));
-  const filteredRelations = relations.filter(
-    (r) => filteredPersonIds.has(r.source) && filteredPersonIds.has(r.target)
+
+  const filteredPersonIds = useMemo(
+    () => new Set(filteredPersons.map((p) => p.id)),
+    [filteredPersons]
+  );
+
+  const filteredRelations = useMemo(
+    () =>
+      relations.filter(
+        (r) => filteredPersonIds.has(r.source) && filteredPersonIds.has(r.target)
+      ),
+    [filteredPersonIds]
   );
 
   const sortedPersons = useMemo(() => {
@@ -107,7 +117,12 @@ export default function RelationGraph({
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         if (width > 0 && height > 0) {
-          setDimensions({ width, height });
+          setDimensions((prev) => {
+            if (Math.abs(prev.width - width) < 1 && Math.abs(prev.height - height) < 1) {
+              return prev;
+            }
+            return { width, height };
+          });
         }
       }
     });
@@ -307,11 +322,6 @@ export default function RelationGraph({
 
       simulation.alpha(0.3).alphaDecay(0.05).restart();
       setIsSimulating(true);
-
-      const startX = node.x ?? 0;
-      const startY = node.y ?? 0;
-      const offsetX = e.clientX;
-      const offsetY = e.clientY;
 
       const handleMouseMove = (moveEvent: MouseEvent) => {
         const container = containerRef.current;

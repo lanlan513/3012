@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Place, CulturalConnection } from '@/types';
+import { CulturalConnection } from '@/types';
 import { places, culturalConnections, getPlaceById } from '@/data/places';
 
 interface EuropeMapProps {
