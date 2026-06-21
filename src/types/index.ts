@@ -143,3 +143,51 @@ export interface CulturalSchool {
   characteristics: string[];
   historicalContext: string;
 }
+
+export type StreetSceneCategory = 'street' | 'station' | 'theater' | 'bookstore';
+
+export interface BuildingHistoryPhase {
+  year: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+}
+
+export interface EasterEgg {
+  id: string;
+  type: 'person' | 'event';
+  title: string;
+  description: string;
+  targetId?: string;
+  quote?: string;
+  position: { x: number; y: number };
+}
+
+export interface StreetBuilding {
+  id: string;
+  name: string;
+  category: StreetSceneCategory;
+  description: string;
+  illustrationPrompt: string;
+  position: { x: number; y: number; width: number; height: number };
+  history: BuildingHistoryPhase[];
+  easterEggs?: EasterEgg[];
+  relatedPersonIds?: string[];
+  relatedEventIds?: string[];
+  atmosphere?: string;
+}
+
+export interface StreetScene {
+  id: string;
+  name: string;
+  category: StreetSceneCategory;
+  era: string;
+  yearRange: string;
+  city: string;
+  description: string;
+  sceneImagePrompt: string;
+  overview: string;
+  buildings: StreetBuilding[];
+  easterEggs: EasterEgg[];
+  historicalBackground: string;
+}

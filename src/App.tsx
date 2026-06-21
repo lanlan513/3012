@@ -10,6 +10,7 @@ import PersonRelationPage from "@/pages/PersonRelation";
 import CafePage from "@/pages/CafePage";
 import NewspaperPage from "@/pages/Newspaper";
 import CultureEvolution from "@/pages/CultureEvolution";
+import StreetArchivePage from "@/pages/StreetArchive";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/cafe" element={<CafePage />} />
         <Route path="/newspaper" element={<NewspaperPage />} />
         <Route path="/culture" element={<CultureEvolution />} />
+        <Route path="/street-archive" element={<StreetArchivePage />} />
         <Route path="/chapter/:id" element={<Chapter />} />
         <Route path="/person/:id" element={<PersonDetail />} />
         <Route path="/place/:id" element={<PlaceDetail />} />

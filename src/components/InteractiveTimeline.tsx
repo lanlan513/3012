@@ -1,109 +1,44 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { TimelineEntry, WarEra } from '@/types';
-import { getWarEra } from '@/data/timelineEntries';
+
+const ERA_RANGES: { era: WarEra; start: number; end: number; color: string; label: string }[] = [
+  { era: 'pre-war', start: 1881, end: 1914, color: 'from-gold-400 to-amber-500', label: '太平盛世' },
+  { era: 'war', start: 1914, end: 1918, color: 'from-red-400 to-red-600', label: '一战烽火' },
+  { era: 'interwar', start: 1918, end: 1933, color: 'from-blue-400 to-blue-600', label: '短暂和平' },
+  { era: 'wwii', start: 1933, end: 1945, color: 'from-gray-500 to-gray-700', label: '黑暗深渊' },
+];
+
+const TRACK_COLORS: Record<string, { bg: string; border: string; text: string; dot: string; label: string }> = {
+  personal: {
+    bg: 'bg-amber-50/60',
+    border: 'border-amber-400/40',
+    text: 'text-amber-800',
+    dot: 'bg-amber-500',
+    label: '人生',
+  },
+  historical: {
+    bg: 'bg-rose-50/60',
+    border: 'border-rose-400/40',
+    text: 'text-rose-800',
+    dot: 'bg-rose-500',
+    label: '历史',
+  },
+  cultural: {
+    bg: 'bg-sky-50/60',
+    border: 'border-sky-400/40',
+    text: 'text-sky-800',
+    dot: 'bg-sky-500',
+    label: '文化',
+  },
+};
 
 interface InteractiveTimelineProps {
   entries: TimelineEntry[];
   birthYear: number;
   deathYear: number;
   onEraChange: (era: WarEra, year: number) => void;
-  onYearChange?: (year: number) => void;
+  onYearChange: (year: number) => void;
 }
-
-const ERA_LABELS: Record<WarEra, string> = {
-  'pre-war': '太平盛世',
-  'war': '一战烽火',
-  'interwar': '短暂和平',
-  'wwii': '黑暗深渊',
-};
-
-const ERA_SUBLABELS: Record<WarEra, string> = {
-  'pre-war': '欧洲的黄金时代，人们对进步与理性充满信心',
-  'war': '战争摧毁了旧世界，理性在炮火面前不堪一击',
-  'interwar': '在废墟上重建文明，但新的危机已在暗处酝酿',
-  'wwii': '欧洲文明最后的崩塌，昨日的世界从此消逝',
-};
-
-const ERA_COLORS: Record<WarEra, {
-  bg: string;
-  border: string;
-  text: string;
-  glow: string;
-  track: string;
-  dot: string;
-  accent: string;
-}> = {
-  'pre-war': {
-    bg: 'from-paper-50 via-amber-50/40 to-paper-100',
-    border: 'border-gold-400/60',
-    text: 'text-gold-700',
-    glow: 'shadow-[0_0_60px_rgba(212,160,23,0.2),0_20px_60px_rgba(212,160,23,0.1)]',
-    track: 'bg-gradient-to-r from-gold-400/40 via-gold-500/50 to-gold-400/40',
-    dot: 'bg-gold-500',
-    accent: 'bg-gradient-to-r from-gold-400 via-gold-500 to-gold-400',
-  },
-  'war': {
-    bg: 'from-red-50/60 via-paper-100 to-red-50/40',
-    border: 'border-red-500/50',
-    text: 'text-red-800',
-    glow: 'shadow-[0_0_60px_rgba(220,38,38,0.2),0_20px_60px_rgba(220,38,38,0.1)]',
-    track: 'bg-gradient-to-r from-red-400/40 via-red-600/50 to-red-400/40',
-    dot: 'bg-red-600',
-    accent: 'bg-gradient-to-r from-red-500 via-red-700 to-red-500',
-  },
-  'interwar': {
-    bg: 'from-paper-50 via-blue-50/30 to-paper-100',
-    border: 'border-blue-400/40',
-    text: 'text-blue-800',
-    glow: 'shadow-[0_0_60px_rgba(59,130,246,0.15),0_20px_60px_rgba(59,130,246,0.08)]',
-    track: 'bg-gradient-to-r from-blue-400/35 via-blue-500/45 to-blue-400/35',
-    dot: 'bg-blue-600',
-    accent: 'bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400',
-  },
-  'wwii': {
-    bg: 'from-gray-100/80 via-gray-200/60 to-gray-100/80',
-    border: 'border-gray-600/50',
-    text: 'text-gray-800',
-    glow: 'shadow-[0_0_60px_rgba(0,0,0,0.25),0_20px_60px_rgba(0,0,0,0.15)]',
-    track: 'bg-gradient-to-r from-gray-500/40 via-gray-700/50 to-gray-500/40',
-    dot: 'bg-gray-800',
-    accent: 'bg-gradient-to-r from-gray-600 via-gray-800 to-gray-600',
-  },
-};
-
-const TRACK_CONFIG = {
-  personal: {
-    label: '人生轨迹',
-    icon: '✦',
-    color: 'bg-amber-600',
-    textColor: 'text-amber-700',
-    borderColor: 'border-amber-500/40',
-    cardBg: 'bg-amber-50/60',
-  },
-  historical: {
-    label: '历史风云',
-    icon: '⚔',
-    color: 'bg-rose-600',
-    textColor: 'text-rose-700',
-    borderColor: 'border-rose-500/40',
-    cardBg: 'bg-rose-50/60',
-  },
-  cultural: {
-    label: '文化脉搏',
-    icon: '❧',
-    color: 'bg-sky-600',
-    textColor: 'text-sky-700',
-    borderColor: 'border-sky-500/40',
-    cardBg: 'bg-sky-50/60',
-  },
-};
-
-const ERA_ICONS: Record<WarEra, string> = {
-  'pre-war': '✦',
-  'war': '⚔',
-  'interwar': '❧',
-  'wwii': '✝',
-};
 
 export default function InteractiveTimeline({
   entries,
@@ -112,563 +47,353 @@ export default function InteractiveTimeline({
   onEraChange,
   onYearChange,
 }: InteractiveTimelineProps) {
-  const [activeYear, setActiveYear] = useState(birthYear);
+  const [selectedYear, setSelectedYear] = useState<number>(Math.max(birthYear, 1895));
   const [isDragging, setIsDragging] = useState(false);
-  const [hoveredEntry, setHoveredEntry] = useState<TimelineEntry | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [hoveredEntry, setHoveredEntry] = useState<number | null>(null);
 
-  const yearRange = useMemo(
-    () => ({
-      start: Math.min(birthYear, ...entries.map((e) => e.year)) - 3,
-      end: Math.max(deathYear, ...entries.map((e) => e.year)) + 3,
-    }),
-    [birthYear, deathYear, entries]
-  );
-
-  const currentEra = getWarEra(activeYear);
-
-  const getYearFromPosition = useCallback(
-    (clientX: number) => {
-      if (!trackRef.current) return activeYear;
-      const rect = trackRef.current.getBoundingClientRect();
-      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      return Math.round(yearRange.start + ratio * (yearRange.end - yearRange.start));
-    },
-    [yearRange, activeYear]
-  );
-
-  const handleMove = useCallback(
-    (clientX: number) => {
-      const year = getYearFromPosition(clientX);
-      setActiveYear(year);
-      onEraChange(getWarEra(year), year);
-      onYearChange?.(year);
-    },
-    [getYearFromPosition, onEraChange, onYearChange]
-  );
+  const minYear = 1881;
+  const maxYear = 1945;
+  const totalYears = maxYear - minYear;
 
   useEffect(() => {
-    if (!isDragging) return;
-    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX);
-    const onMouseUp = () => setIsDragging(false);
-    const onTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX);
-    const onTouchEnd = () => setIsDragging(false);
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        const newYear = Math.max(yearRange.start, activeYear - 1);
-        setActiveYear(newYear);
-        onEraChange(getWarEra(newYear), newYear);
-        onYearChange?.(newYear);
-      } else if (e.key === 'ArrowRight') {
-        const newYear = Math.min(yearRange.end, activeYear + 1);
-        setActiveYear(newYear);
-        onEraChange(getWarEra(newYear), newYear);
-        onYearChange?.(newYear);
-      }
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
-    window.addEventListener('touchend', onTouchEnd);
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [isDragging, handleMove, activeYear, yearRange, onEraChange, onYearChange]);
+    const year = Math.max(Math.min(selectedYear, deathYear), birthYear);
+    onYearChange(year);
 
-  useEffect(() => {
-    onEraChange(currentEra, activeYear);
-    onYearChange?.(activeYear);
-  }, []);
+    const matchedEra = ERA_RANGES.find(
+      (e) => year >= e.start && year < e.end
+    ) || ERA_RANGES[ERA_RANGES.length - 1];
+    onEraChange(matchedEra.era, year);
+  }, [selectedYear, birthYear, deathYear, onEraChange, onYearChange]);
 
-  const scrubberPosition = ((activeYear - yearRange.start) / (yearRange.end - yearRange.start)) * 100;
-
-  const sortedEntries = useMemo(() => [...entries].sort((a, b) => a.year - b.year), [entries]);
-
-  const filteredEntries = useMemo(() => {
-    return sortedEntries.filter((e) => Math.abs(e.year - activeYear) <= 5);
-  }, [sortedEntries, activeYear]);
-
-  const eraColors = ERA_COLORS[currentEra];
-
-  const warZones = useMemo(
-    () => [
-      { start: 1914, end: 1918, era: 'war' as WarEra, label: '一战' },
-      { start: 1939, end: 1945, era: 'wwii' as WarEra, label: '二战' },
-    ],
-    []
+  const sortedEntries = useMemo(
+    () => [...entries].sort((a, b) => a.year - b.year),
+    [entries]
   );
 
-  const decadeMarkers = useMemo(() => {
-    const markers: number[] = [];
-    const startDecade = Math.floor(yearRange.start / 10) * 10;
-    const endDecade = Math.ceil(yearRange.end / 10) * 10;
-    for (let y = startDecade; y <= endDecade; y += 10) {
-      if (y >= yearRange.start && y <= yearRange.end) {
-        markers.push(y);
-      }
+  const yearToPercent = (year: number) => {
+    return ((year - minYear) / totalYears) * 100;
+  };
+
+  const percentToYear = (percent: number) => {
+    return Math.round(minYear + (percent / 100) * totalYears);
+  };
+
+  const handleTrackInteraction = (clientX: number) => {
+    if (!trackRef.current) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const percent = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    setSelectedYear(percentToYear(percent));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    handleTrackInteraction(e.clientX);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    if (e.touches[0]) {
+      handleTrackInteraction(e.touches[0].clientX);
     }
-    return markers;
-  }, [yearRange]);
+  };
 
-  const birthDeathMarkers = useMemo(
-    () => [
-      { year: birthYear, label: '出生', type: 'birth' as const },
-      { year: deathYear, label: '逝世', type: 'death' as const },
-    ],
-    [birthYear, deathYear]
-  );
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        handleTrackInteraction(e.clientX);
+      }
+    };
 
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? 1 : -1;
-      const newYear = Math.max(yearRange.start, Math.min(yearRange.end, activeYear + delta));
-      setActiveYear(newYear);
-      onEraChange(getWarEra(newYear), newYear);
-      onYearChange?.(newYear);
-    },
-    [activeYear, yearRange, onEraChange, onYearChange]
-  );
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging && e.touches[0]) {
+        handleTrackInteraction(e.touches[0].clientX);
+      }
+    };
 
-  const yearColors = ERA_COLORS[currentEra];
+    const handleEnd = () => {
+      setIsDragging(false);
+    };
 
-  const lifeStageText =
-    activeYear < birthYear
-      ? '降生前'
-      : activeYear > deathYear
-      ? '逝世后'
-      : `${activeYear - birthYear} 岁 · 人生的第 ${Math.round(
-          ((activeYear - birthYear) / (deathYear - birthYear)) * 100
-        )}% 旅程`;
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleEnd);
+      window.addEventListener('touchmove', handleTouchMove);
+      window.addEventListener('touchend', handleEnd);
+    }
 
-  const lifePct = ((1914 - yearRange.start) / (yearRange.end - yearRange.start)) * 100;
-  const wwiPct = ((1918 - 1914) / (yearRange.end - yearRange.start)) * 100;
-  const interwarPct = ((1939 - 1918) / (yearRange.end - yearRange.start)) * 100;
-  const wwiiPct = ((yearRange.end - 1939) / (yearRange.end - yearRange.start)) * 100;
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleEnd);
+    };
+  }, [isDragging]);
+
+  const birthPercent = yearToPercent(birthYear);
+  const deathPercent = yearToPercent(deathYear);
+  const selectedPercent = yearToPercent(selectedYear);
 
   return (
-    <div
-      ref={containerRef}
-      className={`relative rounded-sm border-2 ${eraColors.border} ${eraColors.glow} overflow-hidden transition-all duration-1000`}
-      tabIndex={0}
-      onWheel={handleWheel}
-    >
-      <div className={`absolute inset-0 bg-gradient-to-br ${eraColors.bg} transition-all duration-1000`} />
-      <div className="absolute inset-0 paper-bg pointer-events-none opacity-25" />
+    <div className="relative">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-px bg-gradient-to-r from-gold-500/60 to-transparent" />
+        <h3 className="font-decorative text-sm tracking-[0.2em] text-gold-700">
+          人 生 时 光 轴
+        </h3>
+        <div className="flex-1 h-px bg-gradient-to-l from-transparent to-gold-500/60" />
+      </div>
 
-      {currentEra === 'war' && (
-        <div
-          className="absolute inset-0 pointer-events-none z-[1] opacity-[0.04] animate-pulse"
-          style={{
-            background:
-              'repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(127,29,29,0.4) 3px, rgba(127,29,29,0.4) 4px)',
-          }}
-        />
-      )}
-      {currentEra === 'wwii' && (
-        <div
-          className="absolute inset-0 pointer-events-none z-[1] opacity-[0.05]"
-          style={{
-            background:
-              'repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.025) 4px, rgba(0,0,0,0.025) 5px)',
-          }}
-        />
-      )}
-
-      <div className="relative p-8 md:p-12">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className={`w-12 h-[2px] ${yearColors.accent}`} />
-              <h3 className="font-serif text-2xl md:text-3xl text-ink-700 font-semibold">时 间 长 河</h3>
-              <div className={`w-12 h-[2px] ${yearColors.accent}`} />
-            </div>
-            <p className="font-body text-paper-600 text-sm md:text-base italic">
-              拖动滑块 · 滚动滚轮 · 或使用方向键 穿梭于百年岁月
-            </p>
+      <div className="mb-4 flex items-center justify-end gap-4 flex-wrap">
+        {Object.entries(TRACK_COLORS).map(([key, colors]) => (
+          <div key={key} className="flex items-center gap-1.5">
+            <span className={`w-2.5 h-2.5 rounded-full ${colors.dot}`} />
+            <span className="text-xs font-body text-paper-600">{colors.label}</span>
           </div>
-          <div
-            className={`flex items-center gap-3 px-5 py-3 rounded-sm border ${eraColors.border} bg-white/60 backdrop-blur-sm transition-all duration-700`}
-          >
-            <span className={`text-2xl ${eraColors.text}`}>{ERA_ICONS[currentEra]}</span>
-            <div>
-              <div className={`font-decorative text-lg tracking-[0.15em] ${eraColors.text}`}>
-                {ERA_LABELS[currentEra]}
-              </div>
-              <div className="font-body text-xs text-paper-500 max-w-[200px] leading-tight">
-                {ERA_SUBLABELS[currentEra]}
-              </div>
-            </div>
-          </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="text-center mb-10">
-          <div className="relative inline-block">
-            <div className="absolute -inset-8 pointer-events-none">
-              <div
-                className={`absolute top-1/2 left-0 -translate-y-1/2 w-16 h-px bg-gradient-to-r from-transparent ${yearColors.accent} opacity-60`}
-              />
-              <div
-                className={`absolute top-1/2 right-0 -translate-y-1/2 w-16 h-px bg-gradient-to-l from-transparent ${yearColors.accent} opacity-60`}
-              />
-            </div>
+      <div className="relative px-2 md:px-4 mb-6">
+        <div className="flex justify-between mb-2">
+          {ERA_RANGES.map((e, idx) => (
             <div
-              className={`font-serif text-7xl md:text-9xl font-bold tabular-nums transition-all duration-500 ${
-                currentEra === 'war'
-                  ? 'text-red-900'
-                  : currentEra === 'wwii'
-                  ? 'text-gray-900'
-                  : 'text-ink-800'
-              }`}
+              key={idx}
+              className="flex-1 text-center border-l first:border-l-0 border-paper-300/40 px-1"
             >
-              {activeYear}
+              <span className="text-[10px] font-decorative tracking-wider text-paper-500">
+                {e.label}
+              </span>
             </div>
-          </div>
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <span className={`inline-block w-2 h-2 rounded-full ${eraColors.dot} animate-pulse`} />
-            <div className="font-body text-paper-600 text-base md:text-lg">{lifeStageText}</div>
-            <span className={`inline-block w-2 h-2 rounded-full ${eraColors.dot} animate-pulse`} />
-          </div>
+          ))}
         </div>
 
-        <div className="mb-12">
-          <div
-            ref={trackRef}
-            className={`relative h-28 md:h-36 cursor-grab active:cursor-grabbing select-none touch-none rounded-lg md:rounded-xl ${
-              isDragging ? 'scale-[1.005]' : ''
-            } transition-transform duration-200`}
-            onMouseDown={(e) => {
-              setIsDragging(true);
-              handleMove(e.clientX);
-            }}
-            onTouchStart={(e) => {
-              setIsDragging(true);
-              handleMove(e.touches[0].clientX);
-            }}
-          >
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-24 md:h-28 rounded-full overflow-hidden border border-paper-300/60 shadow-inner-paper bg-paper-200/30">
-              <div className="absolute inset-0 flex">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-200/60 via-amber-300/50 to-amber-200/60"
-                  style={{ width: `${lifePct}%` }}
-                />
-                <div className="h-full relative overflow-hidden" style={{ width: `${wwiPct}%` }}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-300/70 via-red-500/50 to-red-300/70" />
-                  <div
-                    className="absolute inset-0 opacity-30"
-                    style={{
-                      background:
-                        'repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(127,29,29,0.3) 8px, rgba(127,29,29,0.3) 16px)',
-                    }}
-                  />
-                </div>
-                <div
-                  className="h-full bg-gradient-to-r from-blue-200/50 via-blue-300/40 to-blue-200/50"
-                  style={{ width: `${interwarPct}%` }}
-                />
-                <div className="h-full relative overflow-hidden" style={{ width: `${wwiiPct}%` }}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-gray-400/60 via-gray-600/50 to-gray-400/60" />
-                  <div
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      background:
-                        'repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,0,0,0.25) 8px, rgba(0,0,0,0.25) 16px)',
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div
-                className={`absolute inset-y-0 left-0 ${eraColors.track} opacity-80 transition-all duration-300 rounded-l-full`}
-                style={{ width: `${scrubberPosition}%` }}
-              />
-            </div>
-
-            {decadeMarkers.map((year) => {
-              const pos = ((year - yearRange.start) / (yearRange.end - yearRange.start)) * 100;
-              return (
-                <div
-                  key={year}
-                  className="absolute top-0 bottom-0 pointer-events-none"
-                  style={{ left: `${pos}%` }}
-                >
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-px h-4 md:h-6 bg-ink-400/50" />
-                  <div className="absolute -bottom-7 md:-bottom-8 left-1/2 -translate-x-1/2 font-serif text-[10px] md:text-xs text-paper-500 tabular-nums font-medium">
-                    {year}
-                  </div>
-                </div>
-              );
-            })}
-
-            {birthDeathMarkers.map((marker) => {
-              const pos = ((marker.year - yearRange.start) / (yearRange.end - yearRange.start)) * 100;
-              if (pos < 0 || pos > 100) return null;
-              const bgClass =
-                marker.type === 'birth' ? 'bg-emerald-500/90 text-white' : 'bg-gray-600/90 text-white';
-              const lineClass = marker.type === 'birth' ? 'bg-emerald-400' : 'bg-gray-400';
-              return (
-                <div
-                  key={marker.type}
-                  className="absolute top-0 bottom-0 pointer-events-none z-10"
-                  style={{ left: `${pos}%` }}
-                >
-                  <div
-                    className={`absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-sm text-[10px] font-decorative tracking-wider ${bgClass}`}
-                  >
-                    {marker.label}
-                  </div>
-                  <div className={`absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-4 ${lineClass}`} />
-                </div>
-              );
-            })}
-
-            {warZones.map((zone) => {
-              const left = ((zone.start - yearRange.start) / (yearRange.end - yearRange.start)) * 100;
-              const width = ((zone.end - zone.start) / (yearRange.end - yearRange.start)) * 100;
-              const zoneBg = zone.era === 'war' ? 'bg-red-600/90 text-white' : 'bg-gray-700/90 text-white';
-              return (
-                <div
-                  key={zone.era + zone.start}
-                  className="absolute top-0 bottom-0 pointer-events-none"
-                  style={{ left: `${left}%`, width: `${width}%` }}
-                >
-                  <div
-                    className={`absolute -top-10 md:-top-12 left-1/2 -translate-x-1/2 px-3 py-1 rounded-sm text-[10px] md:text-xs font-decorative tracking-[0.2em] ${zoneBg} shadow-md whitespace-nowrap`}
-                  >
-                    {zone.label} {zone.start}—{zone.end}
-                  </div>
-                </div>
-              );
-            })}
-
-            {sortedEntries.map((entry, i) => {
-              const pos = ((entry.year - yearRange.start) / (yearRange.end - yearRange.start)) * 100;
-              const isNearActive = Math.abs(entry.year - activeYear) <= 2;
-              const isExact = entry.year === activeYear;
-              const trackOffset =
-                entry.track === 'personal' ? -28 : entry.track === 'historical' ? 0 : 28;
-              const ringClass = isExact ? `ring-2 ring-offset-1 ${TRACK_CONFIG[entry.track].borderColor}` : '';
-              const scaleClass = isExact
-                ? 'scale-150'
-                : isNearActive
-                ? 'scale-110'
-                : 'scale-90 opacity-60 hover:scale-100 hover:opacity-100';
-              return (
-                <div
-                  key={`${entry.year}-${entry.track}-${i}`}
-                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-400 z-10 cursor-pointer"
-                  style={{
-                    left: `${pos}%`,
-                    transform: `translate(-50%, calc(-50% + ${trackOffset}px))`,
-                  }}
-                  onMouseEnter={() => setHoveredEntry(entry)}
-                  onMouseLeave={() => setHoveredEntry(null)}
-                  onClick={() => {
-                    setActiveYear(entry.year);
-                    onEraChange(getWarEra(entry.year), entry.year);
-                    onYearChange?.(entry.year);
-                  }}
-                >
-                  <div className={`transition-all duration-300 ${scaleClass}`}>
-                    <div
-                      className={`w-3.5 h-3.5 rounded-full ${TRACK_CONFIG[entry.track].color} shadow-md border-2 border-paper-100 ${ringClass} transition-all duration-300`}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+        <div
+          ref={trackRef}
+          className="relative h-28 md:h-32 cursor-pointer select-none touch-none"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
+          <div className="absolute inset-x-0 top-12 md:top-14 h-2 bg-paper-300/40 rounded-full overflow-hidden">
+            <div
+              className={`absolute top-0 left-0 h-full bg-gradient-to-r ${
+                ERA_RANGES[0].color
+              }`}
+              style={{ width: `${yearToPercent(1914)}%` }}
+            />
+            <div
+              className={`absolute top-0 h-full bg-gradient-to-r ${ERA_RANGES[1].color}`}
+              style={{
+                left: `${yearToPercent(1914)}%`,
+                width: `${yearToPercent(1918) - yearToPercent(1914)}%`,
+              }}
+            />
+            <div
+              className={`absolute top-0 h-full bg-gradient-to-r ${ERA_RANGES[2].color}`}
+              style={{
+                left: `${yearToPercent(1918)}%`,
+                width: `${yearToPercent(1933) - yearToPercent(1918)}%`,
+              }}
+            />
+            <div
+              className={`absolute top-0 h-full bg-gradient-to-r ${ERA_RANGES[3].color}`}
+              style={{
+                left: `${yearToPercent(1933)}%`,
+                width: `${100 - yearToPercent(1933)}%`,
+              }}
+            />
 
             <div
-              className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-30 pointer-events-none transition-all duration-100 ${
-                isDragging ? 'scale-110' : ''
-              }`}
-              style={{ left: `${scrubberPosition}%` }}
-            >
-              <div className="relative">
-                <div
-                  className={`absolute -inset-4 ${eraColors.text} opacity-20 animate-ping rounded-full`}
-                  style={{ width: '32px', height: '32px' }}
-                />
-                <div
-                  className={`relative w-7 h-7 md:w-8 md:h-8 rounded-full shadow-xl border-[3px] border-paper-100 ${eraColors.dot} flex items-center justify-center`}
-                >
-                  <div className="w-2 h-2 rounded-full bg-paper-100" />
-                </div>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 font-serif text-sm md:text-base font-bold text-ink-700 tabular-nums bg-white/90 px-2 py-0.5 rounded shadow-md shadow-ink-900/10 border border-paper-200 whitespace-nowrap">
-                  {activeYear}
-                </div>
-              </div>
+              className="absolute top-0 h-full bg-white/25"
+              style={{
+                left: `${birthPercent}%`,
+                width: `${deathPercent - birthPercent}%`,
+              }}
+            />
+          </div>
+
+          <div
+            className="absolute top-12 md:top-14 -translate-x-1/2 w-1 h-6 bg-ink-400/50 z-10"
+            style={{ left: `${birthPercent}%` }}
+          >
+            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-serif tabular-nums text-paper-500 whitespace-nowrap">
+              生 {birthYear}
+            </div>
+          </div>
+          <div
+            className="absolute top-12 md:top-14 -translate-x-1/2 w-1 h-6 bg-ink-400/50 z-10"
+            style={{ left: `${deathPercent}%` }}
+          >
+            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-serif tabular-nums text-paper-500 whitespace-nowrap">
+              殁 {deathYear}
             </div>
           </div>
 
-          <div className="flex justify-between text-xs md:text-sm font-serif text-paper-500 mt-12 md:mt-14 px-1">
-            <span className="font-medium tabular-nums">{yearRange.start}</span>
-            <span className="font-medium tabular-nums">{yearRange.end}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-6 md:gap-10 mb-10">
-          {(Object.entries(TRACK_CONFIG) as [keyof typeof TRACK_CONFIG, (typeof TRACK_CONFIG)['personal']][]).map(
-            ([key, config]) => (
-              <div key={key} className="flex items-center gap-3">
-                <div
-                  className={`w-4 h-4 rounded-full shadow-sm ${config.color} border-2 border-paper-100`}
-                />
-                <span className="font-decorative text-sm md:text-base text-ink-600 tracking-wider">
-                  {config.icon} {config.label}
-                </span>
-              </div>
-            )
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 min-h-[280px]">
-          {(['personal', 'historical', 'cultural'] as const).map((track) => {
-            const trackEntries = filteredEntries.filter((e) => e.track === track);
-            const config = TRACK_CONFIG[track];
+          {sortedEntries.map((entry, idx) => {
+            const colors = TRACK_COLORS[entry.track];
+            const percent = yearToPercent(entry.year);
+            const row = idx % 3;
+            const topPos =
+              entry.track === 'personal'
+                ? 8
+                : entry.track === 'historical'
+                  ? 28
+                  : 48;
+            const isHovered = hoveredEntry === idx;
             return (
-              <div key={track} className="space-y-4">
-                <div className={`flex items-center gap-3 pb-3 border-b ${config.borderColor} border-opacity-40`}>
-                  <span className={`text-2xl md:text-3xl ${config.textColor}`}>{config.icon}</span>
-                  <div>
-                    <span className={`font-decorative text-sm md:text-base tracking-[0.15em] ${config.textColor}`}>
-                      {config.label}
-                    </span>
-                    <div className="text-[10px] md:text-xs text-paper-400">{trackEntries.length} 条记录</div>
-                  </div>
-                </div>
-                {trackEntries.length === 0 ? (
+              <div
+                key={idx}
+                className="absolute -translate-x-1/2 z-20"
+                style={{ left: `${percent}%`, top: `${topPos}px` }}
+                onMouseEnter={() => setHoveredEntry(idx)}
+                onMouseLeave={() => setHoveredEntry(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedYear(entry.year);
+                }}
+              >
+                <button
+                  type="button"
+                  className={`w-3 h-3 md:w-3.5 md:h-3.5 rounded-full ${colors.dot} border-2 border-paper-100 shadow-paper transition-all duration-200 hover:scale-150 ${
+                    selectedYear === entry.year ? 'scale-150 ring-2 ring-offset-1 ring-offset-paper-100 ring-white/50' : ''
+                  }`}
+                  title={`${entry.year}: ${entry.title}`}
+                />
+                {isHovered && (
                   <div
-                    className={`${config.cardBg} rounded-sm p-6 text-center border ${config.borderColor} border-opacity-30 min-h-[160px] flex flex-col items-center justify-center`}
+                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 md:w-56 p-3 rounded-sm shadow-paper-lg border ${colors.bg} ${colors.border} z-50 pointer-events-none`}
                   >
-                    <span className="text-4xl mb-3 opacity-30">{config.icon}</span>
-                    <span className="font-serif text-paper-400 text-sm md:text-base italic">
-                      此年代暂无{config.label.slice(0, 2)}记录
-                    </span>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                    {trackEntries.map((entry, i) => {
-                      const distance = Math.abs(entry.year - activeYear);
-                      const isActive = entry.year === activeYear;
-                      const hoverClass =
-                        hoveredEntry === entry
-                          ? `shadow-paper-lg -translate-y-1 ${config.borderColor} border-opacity-60 ring-1`
-                          : `hover:-translate-y-0.5 hover:shadow-paper border-opacity-50`;
-                      const ageText =
-                        entry.year < birthYear
-                          ? `降生前 ${birthYear - entry.year} 年`
-                          : entry.year > deathYear
-                          ? `逝世后 ${entry.year - deathYear} 年`
-                          : `${entry.year - birthYear} 岁`;
-                      return (
-                        <div
-                          key={`${entry.year}-${i}`}
-                          className={`relative rounded-sm p-4 md:p-5 border transition-all duration-500 cursor-pointer ${config.cardBg} ${config.borderColor} ${hoverClass}`}
-                          onMouseEnter={() => setHoveredEntry(entry)}
-                          onMouseLeave={() => setHoveredEntry(null)}
-                          onClick={() => {
-                            setActiveYear(entry.year);
-                            onEraChange(getWarEra(entry.year), entry.year);
-                            onYearChange?.(entry.year);
-                          }}
-                          style={{ opacity: 1 - distance * 0.12 }}
-                        >
-                          {isActive && (
-                            <div
-                              className={`absolute -top-2 left-4 px-2 py-0.5 rounded-sm text-[10px] font-decorative tracking-wider bg-ink-100 ${config.textColor} border ${config.borderColor}`}
-                            >
-                              当前年代
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className={`font-decorative text-xs md:text-sm tracking-wider ${config.textColor}`}>
-                              {entry.year}
-                            </span>
-                            <span className="text-paper-300">·</span>
-                            <span className="text-xs text-paper-400">{ageText}</span>
-                          </div>
-                          <h4 className="font-serif text-base md:text-lg text-ink-800 font-semibold mb-2 leading-snug">
-                            {entry.title}
-                          </h4>
-                          <p className="font-body text-sm md:text-base text-paper-700 leading-relaxed">
-                            {entry.description}
-                          </p>
-                        </div>
-                      );
-                    })}
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className={`font-serif text-xs tabular-nums font-bold ${colors.text}`}>
+                        {entry.year}
+                      </span>
+                      <span className="text-paper-300 text-xs">·</span>
+                      <span className={`text-[10px] font-decorative tracking-wider ${colors.text}`}>
+                        {colors.label}
+                      </span>
+                    </div>
+                    <div className={`font-serif text-sm leading-snug ${colors.text}`}>
+                      {entry.title}
+                    </div>
+                    <div className="mt-1.5 font-body text-[11px] text-paper-600 leading-relaxed line-clamp-2">
+                      {entry.description}
+                    </div>
+                    <div
+                      className={`absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 rotate-45 border-r border-b ${colors.border} ${colors.bg}`}
+                    />
                   </div>
                 )}
               </div>
             );
           })}
+
+          <div
+            className="absolute top-0 bottom-0 -translate-x-1/2 z-30 pointer-events-none"
+            style={{ left: `${selectedPercent}%` }}
+          >
+            <div className="absolute top-12 md:top-14 -translate-y-1/2 -translate-x-1/2 w-6 h-6 md:w-7 md:h-7 rounded-full bg-ink-800 border-2 border-white shadow-paper-lg flex items-center justify-center">
+              <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-gold-400 animate-pulse" />
+            </div>
+            <div
+              className="absolute top-12 md:top-14 left-1/2 -translate-x-1/2 w-px"
+              style={{
+                height: '80px',
+                background:
+                  'linear-gradient(180deg, rgba(51, 37, 21, 0.3) 0%, rgba(51, 37, 21, 0.1) 100%)',
+              }}
+            />
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-sm bg-ink-800 text-paper-100 text-xs font-serif tabular-nums shadow-paper whitespace-nowrap">
+              {selectedYear}
+            </div>
+          </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-paper-300/50">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-            <div className="flex items-center gap-6 flex-wrap justify-center">
-              {(['pre-war', 'war', 'interwar', 'wwii'] as WarEra[]).map((era) => {
-                const ec = ERA_COLORS[era];
-                const activeClass =
-                  currentEra === era
-                    ? `${ec.border} ${ec.text} bg-white/80 shadow-paper`
-                    : 'border-paper-300/50 text-paper-500 hover:bg-white/50 hover:text-ink-600';
-                const targetYear = era === 'pre-war' ? 1910 : era === 'war' ? 1916 : era === 'interwar' ? 1928 : 1942;
-                return (
-                  <button
-                    key={era}
-                    onClick={() => {
-                      const clampedYear = Math.max(yearRange.start, Math.min(yearRange.end, targetYear));
-                      setActiveYear(clampedYear);
-                      onEraChange(era, clampedYear);
-                      onYearChange?.(clampedYear);
-                    }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-sm border transition-all duration-300 ${activeClass}`}
-                  >
-                    <span>{ERA_ICONS[era]}</span>
-                    <span className="font-decorative text-xs md:text-sm tracking-wider">{ERA_LABELS[era]}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-2 flex-wrap text-center">
-            <div className="flex items-center gap-2 text-xs md:text-sm text-paper-500 font-body">
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-paper-200/50 border border-paper-300/50">
-                <kbd className="font-mono">←</kbd>
-                <kbd className="font-mono">→</kbd>
-              </span>
-              <span>方向键切换年代</span>
-            </div>
-            <span className="text-paper-300">|</span>
-            <div className="flex items-center gap-2 text-xs md:text-sm text-paper-500 font-body">
-              <span>🖱 滚轮滚动</span>
-              <span>快速浏览</span>
-            </div>
-            <span className="text-paper-300">|</span>
-            <div className="flex items-center gap-2 text-xs md:text-sm text-paper-500 font-body">
-              <span>✋ 拖拽滑块</span>
-              <span>精确跳转</span>
-            </div>
-          </div>
+        <div className="flex justify-between mt-6 md:mt-8">
+          {Array.from({ length: 7 }, (_, i) => {
+            const year = minYear + i * Math.floor(totalYears / 6);
+            return (
+              <button
+                key={year}
+                type="button"
+                onClick={() => setSelectedYear(year)}
+                className={`text-[10px] md:text-xs font-serif tabular-nums transition-colors duration-200 ${
+                  selectedYear === year
+                    ? 'text-gold-700 font-bold'
+                    : 'text-paper-500 hover:text-paper-700'
+                }`}
+              >
+                {year}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {currentEra === 'war' && (
-        <div className="absolute inset-0 pointer-events-none border-4 border-red-500/10 rounded-sm animate-pulse duration-2000" />
+      {sortedEntries.length > 0 && (
+        <div className="bg-paper-100/70 rounded-sm p-4 md:p-5 border border-paper-300/40 shadow-paper relative">
+          <div className="absolute inset-0 paper-bg rounded-sm pointer-events-none opacity-30" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-gold-600 text-sm">❦</span>
+              <h4 className="font-serif text-base md:text-lg font-semibold text-ink-800">
+                {selectedYear} 年 · 时间的印记
+              </h4>
+            </div>
+            {(() => {
+              const nearEntries = sortedEntries
+                .filter((e) => Math.abs(e.year - selectedYear) <= 5)
+                .slice(0, 3);
+              if (nearEntries.length === 0) {
+                return (
+                  <p className="font-body text-sm text-paper-600 italic">
+                    这一年，{selectedYear - birthYear} 岁的人生平静地流淌...
+                  </p>
+                );
+              }
+              return (
+                <div className="space-y-2.5">
+                  {nearEntries.map((entry, idx) => {
+                    const colors = TRACK_COLORS[entry.track];
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-3 rounded-sm border ${colors.bg} ${colors.border} transition-all duration-200 hover:-translate-x-0.5`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`flex-shrink-0 w-7 h-7 rounded-full ${colors.dot} bg-opacity-20 flex items-center justify-center border ${colors.border}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`font-serif text-sm font-bold ${colors.text}`}>
+                                {entry.year}
+                              </span>
+                              <span className="text-[10px] font-decorative tracking-wider text-paper-500">
+                                {colors.label}
+                              </span>
+                            </div>
+                            <div className={`font-serif text-sm md:text-base ${colors.text} mb-1 font-semibold`}>
+                              {entry.title}
+                            </div>
+                            <p className="font-body text-xs md:text-sm text-paper-600 leading-relaxed">
+                              {entry.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
+        </div>
       )}
-      {currentEra === 'wwii' && (
-        <div
-          className="absolute inset-0 pointer-events-none rounded-sm"
-          style={{ boxShadow: 'inset 0 0 100px rgba(0,0,0,0.2)' }}
-        />
-      )}
+
+      <p className="mt-4 text-center text-[11px] font-body text-paper-500">
+        拖动上方时间轴上的金色指针，或点击标记点，探索不同年代的世界
+      </p>
     </div>
   );
 }
