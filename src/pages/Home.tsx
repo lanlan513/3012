@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div
       className="bg-gradient-to-b from-paper-50 via-paper-100 to-paper-200 relative overflow-hidden"
-      style={{ minHeight: '100vh', height: '100vh' }}
+      style={{ minHeight: '100vh' }}
     >
       {/* Background texture */}
       <div className="absolute inset-0 paper-bg opacity-50" />
@@ -37,14 +37,13 @@ export default function Home() {
         }}
       />
 
-      {/* Main content - 高度限制为视口高度，居中布局 */}
+      {/* Main content */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center px-4"
-        style={{ minHeight: '100vh', height: '100vh' }}
+        className="relative z-10 grid min-h-screen grid-rows-[auto_minmax(0,1fr)_auto] items-center px-4 py-8"
       >
-        {/* Top decoration - 更紧凑 */}
+        {/* Top decoration */}
         <div
-          className="mb-4 md:mb-6"
+          className="justify-self-center"
           style={{
             animation: 'fadeIn 1s ease-out 200ms both',
           }}
@@ -68,26 +67,16 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Book component - 更紧凑的高度，确保内容在首屏 */}
+        {/* Book component */}
         <div
-          className="flex-shrink-0 w-full max-w-[560px] mb-3 md:mb-5"
-          style={{ height: 'clamp(400px, 72vh, 640px)' }}
+          className="my-4 w-full justify-self-center"
         >
-          <div className="w-full h-full flex items-center justify-center">
-            <div
-              className="origin-center"
-              style={{
-                transform: 'scale(clamp(0.65, 1vw, 1))',
-              }}
-            >
-              <Book />
-            </div>
-          </div>
+          <Book />
         </div>
 
-        {/* Bottom text - 更紧凑，整合在首屏 */}
+        {/* Bottom text */}
         <div
-          className="text-center"
+          className="text-center justify-self-center"
           style={{
             animation: 'fadeIn 1s ease-out 2800ms both',
           }}
@@ -103,9 +92,9 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 向下提示 - 更低调 */}
+        {/* Entry hint */}
         <div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2"
           style={{
             animation: 'fadeIn 1s ease-out 3200ms both, float 6s ease-in-out 3200ms infinite',
           }}
