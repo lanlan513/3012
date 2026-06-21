@@ -7,6 +7,7 @@ import { CATEGORY_LABELS } from '@/data/persons';
 import { useState, useMemo, useEffect } from 'react';
 import { WarEra, TimelineEntry } from '@/types';
 import InteractiveTimeline from '@/components/InteractiveTimeline';
+import CivilizationCountdown from '@/components/CivilizationCountdown';
 
 const ERA_THEMES: Record<WarEra, {
   overlay: string;
@@ -576,6 +577,25 @@ export default function PersonDetail() {
                 onEraChange={handleEraChange}
                 onYearChange={handleYearChange}
               />
+            </section>
+          )}
+
+          {activeYear > 0 && (currentEra === 'pre-war' || (currentEra === 'war' && activeYear <= 1914)) && (
+            <section className="mb-16">
+              <div className="flex items-center gap-4 mb-7">
+                <div className={`w-10 h-px ${
+                  currentEra === 'war' ? 'bg-gradient-to-r from-transparent via-red-400/60 to-red-400/60' :
+                  'bg-gradient-to-r from-transparent via-gold-400/60 to-gold-400/60'
+                }`} />
+                <h2 className={`font-serif text-2xl md:text-3xl font-semibold whitespace-nowrap transition-colors duration-500 ${theme.titleColor}`}>
+                  文明倒计时
+                </h2>
+                <div className={`flex-1 h-px ${
+                  currentEra === 'war' ? 'bg-gradient-to-l from-transparent via-red-400/60 to-red-400/60' :
+                  'bg-gradient-to-l from-transparent via-gold-400/60 to-gold-400/60'
+                }`} />
+              </div>
+              <CivilizationCountdown year={activeYear} currentEra={currentEra} />
             </section>
           )}
 

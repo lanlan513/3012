@@ -246,3 +246,29 @@ export interface DualTimelineData {
   themeQuote: string;
   themeQuoteAuthor: string;
 }
+
+export interface CivilizationIndex {
+  culture: number;
+  international: number;
+  stability: number;
+}
+
+export interface YearPerspective {
+  year: number;
+  publicMood: string;
+  prevailingBelief: string;
+  culturalHighlights: string[];
+  diplomaticClimate: string;
+  socialUnderCurrent: string;
+  quote: string;
+  quoteAuthor: string;
+  indices: CivilizationIndex;
+  omens: string[];
+}
+
+export interface CountdownData {
+  daysToWar: number;
+  formattedDate: string;
+  perspective: YearPerspective;
+  urgency: 'calm' | 'unease' | 'tension' | 'crisis' | 'war';
+}
