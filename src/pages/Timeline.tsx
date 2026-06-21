@@ -1,6 +1,6 @@
 import Timeline from '@/components/Timeline';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 
 export default function TimelinePage() {
   return (
@@ -18,7 +18,7 @@ export default function TimelinePage() {
               className="inline-flex items-center gap-2 text-paper-600 hover:text-gold-700 transition-colors duration-300 font-body text-sm"
             >
               <ArrowLeft size={16} />
-              <span>返回首页</span>
+              <span className="hidden sm:inline">返回首页</span>
             </Link>
 
             {/* Title */}
@@ -31,8 +31,15 @@ export default function TimelinePage() {
               </p>
             </div>
 
-            {/* Spacer for balance */}
-            <div className="w-20" />
+            {/* Map entry button */}
+            <Link
+              to="/map"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gold-500/40 text-gold-700 hover:bg-gold-500 hover:text-paper-100 transition-all duration-300 font-decorative text-xs tracking-[0.12em] shadow-sm"
+            >
+              <MapPin size={14} />
+              <span className="hidden sm:inline">昨 日 地 图</span>
+              <span className="sm:hidden">地 图</span>
+            </Link>
           </div>
 
           {/* Decorative divider */}

@@ -20,6 +20,23 @@ export interface Person {
   chapterIds: string[];
 }
 
+export interface EraContext {
+  era: string;
+  chapterId: string;
+  yearRange: string;
+  culture: string;
+  art: string;
+  society: string;
+  notableFigures?: string[];
+}
+
+export interface Coordinates {
+  lat: number;
+  lng: number;
+  x: number;
+  y: number;
+}
+
 export interface Place {
   id: string;
   name: string;
@@ -27,6 +44,18 @@ export interface Place {
   description: string;
   imageUrl: string;
   quote: string;
+  chapterIds: string[];
+  coordinates: Coordinates;
+  eraContexts: EraContext[];
+}
+
+export interface CulturalConnection {
+  id: string;
+  from: string;
+  to: string;
+  type: 'literary' | 'artistic' | 'musical' | 'philosophical' | 'historical';
+  description: string;
+  era: string;
   chapterIds: string[];
 }
 
